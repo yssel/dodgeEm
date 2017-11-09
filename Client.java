@@ -8,37 +8,40 @@ import java.net.UnknownHostException;
 
 public class Client implements Runnable {
    private static Socket clientSocket = null;
-   private static PrintStream os = null;
-   private static DataInputStream is = null;
+   private static PrintStream outputStream = null;
+   private static DataInputStream inputStream = null;
 
    private static BufferedReader inputLine = null;
    private static boolean closed = false;
 
    public static void main(String[] args) {
-      int portNumber = 8080;
-      String host = "localhost";
+      int portNumber = Integer.parseInt(args[1]);
+      String host = args[0];
 
+    //Client tries to join the server at host:portnumber
       try {
-      clientSocket = new Socket(host, portNumber);
-      inputLine = new BufferedReader(new InputStreamReader(System.in));
-      os = new PrintStream(clientSocket.getOutputStream());
-      is = new DataInputStream(clientSocket.getInputStream());
+        System.out.println("Joining " + host + ":" + portNumber);
+        clientSocket = new Socket(host, portNumber);
+        inputLine = new BufferedReader(new InputStreamReader(System.in));
+        outputStream = new PrintStream(clientSocket.getOutputStream());
+        inputStream = new DataInputStream(clientSocket.getInputStream());
       }
       catch (UnknownHostException e){
-         System.out.println("Error. Host unknown." + host);
+         System.out.println("Host unknown.");
       }
       catch (IOException e){
-         System.out.println("No I/O for host connection." + host);
+         System.out.println("No I/O for host connection.");
       }
 
-      if (clientSocket != null && os != null && is != null) {
+      //Allows user to enter message
+      if (clientSocket != null && outputStream != null && inputStream != null) {
          try {
             new Thread(new Client()).start();
             while(!closed) {
-               os.println(inputLine.readLine().trim());
+                outputStream.println(inputLine.readLine().trim());
             }
-            os.close();
-            is.close();
+            outputStream.close();
+            inputStream.close();
             clientSocket.close();
          }
          catch (IOException e) {
@@ -49,12 +52,11 @@ public class Client implements Runnable {
 
    public void run() {
       String responseLine;
+
+      //Displays the sent message to the sender
       try {
-         while((responseLine = is.readLine()) != null) {
+         while((responseLine = inputStream.readLine()) != null) {
             System.out.println(responseLine);
-            if (responseLine.indexOf("Bye") != -1) {
-               break;
-            }
          }
          closed = true;
       }
