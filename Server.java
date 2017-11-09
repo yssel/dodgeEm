@@ -3,6 +3,7 @@ import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
+import javax.sound.midi.SysexMessage;
 
 public class Server {
   private static ServerSocket serverSocket = null;
@@ -10,30 +11,44 @@ public class Server {
   private static final int maxClientsCount = 10;
   private static final clientThread[] threads = new clientThread[maxClientsCount];
 
+  
+  //Usage: java Server [portNumber]
   public static void main(String args[]) {
-    int portNumber = 8080;
-    
-    try {
-      serverSocket = new ServerSocket(portNumber);
+    if(args.length == 0){
+      System.out.println("Usage: java Server [portNumber]");
+      System.exit(1);
     }
-    catch (IOException e) {
+    
+    //Creates server at specific port number
+    try { 
+      int portNumber = Integer.parseInt(args[0]);    
+      serverSocket = new ServerSocket(portNumber);
+      System.out.println("Listening at port " + portNumber);
+    }
+    catch(IOException e) {
       System.out.println(e);
     }
 
-    while (true) {
+    while(true) {
       try {
         clientSocket = serverSocket.accept();
-        int i = 0;
-        for (i = 0; i < maxClientsCount; i++) {
+
+        int activeClientCount = 0;
+
+        //The server creates a new client thread when there is an available slot
+        for(int i = 0; i < maxClientsCount; i++) {
           if (threads[i] == null) {
             (threads[i] = new clientThread(clientSocket, threads)).start();
+            activeClientCount = i;
             break;
           }
         }
-        if (i == maxClientsCount) {
-          PrintStream os = new PrintStream(clientSocket.getOutputStream());
-          os.println("Server too busy. Try later.");
-          os.close();
+
+        //If the active client count is beyond the server capacity, it will not allow the client to join the server.
+        if(activeClientCount == maxClientsCount) {
+          PrintStream outputStream = new PrintStream(clientSocket.getOutputStream());
+          outputStream.println("Server too busy. Try later.");
+          outputStream.close();
           clientSocket.close();
         }
       }
@@ -45,10 +60,9 @@ public class Server {
 }
 
 class clientThread extends Thread {
-
   private String clientName = null;
-  private DataInputStream is = null;
-  private PrintStream os = null;
+  private DataInputStream inputStream = null;
+  private PrintStream outputStream = null;
   private Socket clientSocket = null;
   private final clientThread[] threads;
   private int maxClientsCount;
@@ -64,80 +78,60 @@ class clientThread extends Thread {
     clientThread[] threads = this.threads;
 
     try {
-      is = new DataInputStream(clientSocket.getInputStream());
-      os = new PrintStream(clientSocket.getOutputStream());
+      inputStream = new DataInputStream(clientSocket.getInputStream());
+      outputStream = new PrintStream(clientSocket.getOutputStream());
       String name;
-      while (true) {
-        os.println("Enter your name.");
-        name = is.readLine().trim();
-        if (name.indexOf('@') == -1) {
-          break;
-        } else {
-          os.println("The name should not contain '@' character.");
-        }
-      }
 
-      os.println("Welcome " + name
-          + " to our chat room.\nTo leave enter /quit in a new line.");
+      // Prompts client to enter display name
+      outputStream.println("Enter your name: ");
+      name = inputStream.readLine().trim();
+
+      outputStream.println("Welcome to Dodge 'Em chat room. Enter /quit to leave");
       synchronized (this) {
         for (int i = 0; i < maxClientsCount; i++) {
           if (threads[i] != null && threads[i] == this) {
-            clientName = "@" + name;
+            clientName = name;
             break;
           }
         }
+
+        // Notifies other users that a new user has entered the chat room
         for (int i = 0; i < maxClientsCount; i++) {
           if (threads[i] != null && threads[i] != this) {
-            threads[i].os.println("*** A new user " + name
-                + " entered the chat room !!! ***");
+            threads[i].outputStream.println(name + " entered the chat room");
           }
         }
       }
       
       while (true) {
-        String line = is.readLine();
+        String line = inputStream.readLine();
         if (line.startsWith("/quit")) {
           break;
         }
-        if (line.startsWith("@")) {
-          String[] words = line.split("\\s", 2);
-          if (words.length > 1 && words[1] != null) {
-            words[1] = words[1].trim();
-            if (!words[1].isEmpty()) {
-              synchronized (this) {
-                for (int i = 0; i < maxClientsCount; i++) {
-                  if (threads[i] != null && threads[i] != this
-                      && threads[i].clientName != null
-                      && threads[i].clientName.equals(words[0])) {
-                    threads[i].os.println("<" + name + "> " + words[1]);
-                    this.os.println(">" + name + "> " + words[1]);
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        } else {
+        // Sends message to all users
+        else {
           synchronized (this) {
             for (int i = 0; i < maxClientsCount; i++) {
               if (threads[i] != null && threads[i].clientName != null) {
-                threads[i].os.println("<" + name + "> " + line);
+                threads[i].outputStream.println("<" + name + "> " + line);
               }
             }
           }
         }
       }
+
+      // Notifies other users when a user left the room
       synchronized (this) {
         for (int i = 0; i < maxClientsCount; i++) {
           if (threads[i] != null && threads[i] != this
               && threads[i].clientName != null) {
-            threads[i].os.println("*** The user " + name
-                + " is leaving the chat room !!! ***");
+            threads[i].outputStream.println(name + " left the chat room.");
           }
         }
       }
-      os.println("Bye " + name);
+      outputStream.println("You left the chat room");
 
+      // Free up slots in server
       synchronized (this) {
         for (int i = 0; i < maxClientsCount; i++) {
           if (threads[i] == this) {
@@ -146,8 +140,8 @@ class clientThread extends Thread {
         }
       }
 
-      is.close();
-      os.close();
+      inputStream.close();
+      outputStream.close();
       clientSocket.close();
     } catch (IOException e) {
     }
