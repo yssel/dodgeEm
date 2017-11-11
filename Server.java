@@ -118,13 +118,13 @@ public class Server implements Runnable, Const{
             break;
           case IN_PROGRESS:
              //Player data was received!
-            String[] playerInfo = playerData.split(";"); 
+            String[] playerInfo = playerData.split("\n"); 
             if (playerInfo[0].equals("CHAT")){
               //Tokenize:
               //The format: CHAT;<player name>;<message>           
               String pname =playerInfo[1];
               String message= playerInfo[2];
-              broadcast("CHAT;"+pname+";"+message);
+              broadcast("CHAT\n"+pname+"\n"+message);
             }
             break;
       }         

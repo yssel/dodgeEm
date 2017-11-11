@@ -51,7 +51,7 @@ public class Client implements Runnable, Const{
 
       try{
         if(in.ready()){       
-          send("CHAT;"+name+";"+in.readLine());  
+          send("CHAT\n"+name+"\n"+in.readLine());  
         }
       }
       catch(Exception e){}
@@ -83,7 +83,7 @@ public class Client implements Runnable, Const{
       }else if (connected){
         //if the server has other player's chat
         //not yet sure for batch chat
-        String[] playerInfo = serverData.split(";"); 
+        String[] playerInfo = serverData.split("\n"); 
         if (playerInfo[0].equals("CHAT")){
             String pname =playerInfo[1];
             String chatMessage = playerInfo[2]; 
