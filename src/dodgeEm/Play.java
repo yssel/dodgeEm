@@ -51,22 +51,42 @@ public class Play extends BasicGameState {
             float carY = this.playerCar.getPositionY();
             carY += delta * 0.1f;
             this.playerCar.setPositionY(carY);
+
+            if(this.playerCar.getPositionY() > -144){
+                carY -= 5 + delta * 10f;
+                this.playerCar.setPositionY(carY);
+            }
         }
         else if(curY > new Float(this.centerY)){
             float carY = this.playerCar.getPositionY();
             carY -= delta * 0.1f;
             this.playerCar.setPositionY(carY);
+
+            if(this.playerCar.getPositionY() < -3046){
+                carY += 5 + delta * 10f;
+                this.playerCar.setPositionY(carY);
+            }
         }
 
         if(curX < new Float(this.centerX)){
             float carX = this.playerCar.getPositionX();
             carX += delta * 0.1f;
             this.playerCar.setPositionX(carX);
+            if(this.playerCar.getPositionX() > -47){
+                carX -= 5 + delta * 10f;
+                this.playerCar.setPositionX(carX);
+            }
         }
         else if(curX > new Float(this.centerX)){
             float carX = this.playerCar.getPositionX();
             carX -= delta * 0.1f;
             this.playerCar.setPositionX(carX);
+            if(this.playerCar.getPositionX() < -4068){
+                carX += 5 + delta * 10f;
+                this.playerCar.setPositionX(carX);
+            }
         }
     }
+
+
 }
