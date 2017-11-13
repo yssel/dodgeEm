@@ -29,25 +29,44 @@ public class Play extends BasicGameState {
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         this.centerX = gameContainer.getWidth()/2;
         this.centerY = gameContainer.getHeight()/2;
+        this.curX = this.centerX;
+        this.curY = this.centerY;
+        this.playerCar.init();
     }
-
 
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
         graphics.drawString("x: " + this.curX + " y: " + this.curY, 100, 10);
         this.playerCar.render(this.centerX, this.centerY, graphics);
-
-
-
     }
 
 
     @Override
-    public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i) throws SlickException {
+    public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int delta) throws SlickException {
         this.curX = Mouse.getX();
         this.curY = gameContainer.getHeight() - Mouse.getY();
         this.playerCar.trackMouse(this.curX, this.curY, this.centerX, this.centerY);
+
+        if(curY < new Float(this.centerY)){
+            float carY = this.playerCar.getPositionY();
+            carY += delta * 0.1f;
+            this.playerCar.setPositionY(carY);
+        }
+        else if(curY > new Float(this.centerY)){
+            float carY = this.playerCar.getPositionY();
+            carY -= delta * 0.1f;
+            this.playerCar.setPositionY(carY);
+        }
+
+        if(curX < new Float(this.centerX)){
+            float carX = this.playerCar.getPositionX();
+            carX += delta * 0.1f;
+            this.playerCar.setPositionX(carX);
+        }
+        else if(curX > new Float(this.centerX)){
+            float carX = this.playerCar.getPositionX();
+            carX -= delta * 0.1f;
+            this.playerCar.setPositionX(carX);
+        }
     }
-
-
 }
