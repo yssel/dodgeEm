@@ -33,6 +33,8 @@ public class Play extends BasicGameState {
     private Car car = null;
     private Car myCar = null;
 
+    private PowerUp health;
+
     public Play(int state) {
         this.car = new Car("Rain", 1);
         this.myCar = new Car("My Car", 1);
@@ -46,19 +48,28 @@ public class Play extends BasicGameState {
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         /**INITIALIZE MAP **/
-        this.map = new Image("res/map.png").getScaledCopy(0.6f);
+        map = new Image("res/map.png").getScaledCopy(0.6f);
+
+
+        /** INITIALIZE POWER UP **/
+        health = new Health(1000, 1000);
 
         /** INITIALIZE OTHER BUMPER CARS **/
         car.init(650, 500);
 
         /** INITIALIZE MY CAR **/
         myCar.init(0, 0);
+
+
     }
 
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
         /** RENDERING OF MAP **/
         map.draw(mapX, mapY);
+
+        /** RENDERING OF POWER UPS **/
+        health.render();
 
         /**RENDERING OF BUMPER CARS */
         car.render();
@@ -85,10 +96,8 @@ public class Play extends BasicGameState {
         float opposite = targetY - Play.CENTER_Y;
         float adjacent = targetX - Play.CENTER_X;
 
-        /** ROTATION OF SPRITE AND BOUNDING POLYGON **/
+        /** ROTATION OF MY BUMPER CAR **/
         myCar.angle = (float) Math.toDegrees(Math.atan2(opposite, adjacent));
-        myCar.initBounds(Play.OFFSET_X, Play.OFFSET_Y); //Re-initialize polygon to reset its angle
-        myCar.bounds = myCar.bounds.transform(Transform.createRotateTransform((float) Math.toRadians(myCar.angle)));
     }
 
     private void playCursor(int delta){
