@@ -9,6 +9,13 @@ import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.state.*;
 import org.newdawn.slick.tests.xml.Inventory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -42,11 +49,20 @@ public class Play extends BasicGameState {
     private Car myCar = null;
 
     private ConcurrentHashMap<Integer, PowerUp> powerUps;
+    private String server;
+    private DatagramSocket socket;
 
-    public Play(int state) {
+    public Play(int state, String server) {
         car = new Car("Rain", 1);
         myCar = new Car("My Car", 1);
         powerUps = new ConcurrentHashMap<>();
+        this.server = server;
+
+        try{
+            this.socket = new DatagramSocket();
+            this.socket.setSoTimeout(100);
+        }catch(Exception e){}
+
     }
 
     @Override
@@ -55,7 +71,7 @@ public class Play extends BasicGameState {
     }
 
     @Override
-    public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
+    public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException  {
         /**INITIALIZE MAP **/
         map = new Image("res/map.png").getScaledCopy(0.6f);
 
@@ -111,14 +127,35 @@ public class Play extends BasicGameState {
                powerUps.remove(i);
             }
         }
-
-
-
-
-
-
-
+        this.send(myCar);
     }
+
+    public void send(Car car){
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out = null;
+
+        try{
+            out = new ObjectOutputStream(bos);
+            out.writeObject(car);
+            out.flush();
+            byte[] buffer = bos.toByteArray();
+
+            InetAddress serverAddress = InetAddress.getByName(server);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, GameServer.PORT);
+            System.out.println("BUFFERRRR " + buffer.length);
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try{
+                bos.close();
+            }catch (IOException ex){}
+        }
+    }
+
+
 
 
     public void trackCursor(float targetX, float targetY){

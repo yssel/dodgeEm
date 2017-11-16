@@ -15,7 +15,7 @@ public class Game extends StateBasedGame {
     public Game(String title){
         super(title);
         this.addState(new MainMenu(MENU));
-        this.addState(new Play(PLAY));
+        this.addState(new Play(PLAY, "192.18.1.1"));
     }
 
     @Override

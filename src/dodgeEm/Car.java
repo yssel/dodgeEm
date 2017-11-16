@@ -5,8 +5,10 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.geom.*;
 import org.newdawn.slick.state.*;
 
+import java.io.Serializable;
 
-public class Car {
+
+public class Car  implements Serializable{
 
     /** HEALTH **/
     private int hp;
