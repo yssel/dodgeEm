@@ -10,136 +10,136 @@ import org.newdawn.slick.state.*;
 
 
 public class Car {
-    private String playerName;
+
+    /** HEALTH **/
     private int hp;
     private int totalHp;
 
-    private int carColor;
-    private float angle;
+    /** POSITIONING AND DIRECTION **/
+    protected float posX;
+    protected float posY;
+    protected float angle;
 
-    private Image sprite;
-    private float posX;
-    private float posY;
+    /** SIZE **/
     private float width;
-    private float length;
+    private float height;
 
-    private Shape bounds;
+    /** VISUALIZATION **/
+    private Image sprite;
+    protected Shape bounds;
 
 
-    public Car(String name, int color){
-        this.playerName = name;
-        this.totalHp = 100;
+    public Car(String name, int color){ }
+
+    public void init(float x, float y) throws SlickException{
+        /** HEALTH **/
         this.hp = 50;
-        this.carColor = color;
-//        this.angle = 270;
-        this.posX = 0;
-        this.posY = 0;
-    }
+        this.totalHp = 100;
 
-    public void init() throws SlickException{
+        /** CAR POSITIONING AND DIRECTION **/
+        this.posX = x;
+        this.posY = y;
+        this.angle = 270;
+
+        /** MAP POSITIONING **/
+        Play.mapX = this.posX + Play.OFFSET_X;
+        Play.mapY = this.posY + Play.OFFSET_Y;
+
+        /** VISUALIZATION AND SIZING **/
         this.sprite = new Image("res/red-car.png").getScaledCopy(new Float(0.13));
         this.width = this.sprite.getWidth();
-        this.length = this.sprite.getHeight();
-        this.initBounds();
+        this.height = this.sprite.getHeight();
+        this.initBounds(x, y);
+
     }
 
-    public void render(int centerX, int centerY, Graphics graphics) throws SlickException{
-        graphics.drawString("x: " + this.posX + " y: " + this.posY, 400, 10);
-        graphics.drawString("sX: " + centerX + " sY: " + centerY, 400, 30);
-
-
-        //Render Car
-        sprite.setRotation(this.angle);
-        sprite.drawCentered(centerX, centerY);
-
-
-        graphics.setColor(Color.blue);
-        graphics.drawRect(centerX, centerY, 100, 100);
-
-        //Render Player Name
-        graphics.setColor(Color.white);
-        graphics.drawString(this.playerName, centerX-20, centerY-100);
-
-        this.drawBounds(Color.red, graphics);
-        //Render health
-        graphics.setColor(Color.red);
-        graphics.fillRoundRect(centerX-(this.totalHp/2),centerY+70, this.totalHp, 15, 20);
-
-        graphics.setColor(Color.green);
-        graphics.fillRoundRect(centerX-(this.totalHp/2),centerY+70, this.hp, 15, 20);
-    }
-
-    public void initBounds(){
-        float centerX = Game.SCREEN_WIDTH/2;
-        float centerY = Game.SCREEN_HEIGHT/2;
-
+    /** INITIALIZE BOUNDING POLYGON **/
+    public void initBounds(float x, float y){
         float[] points = {
-                centerX-(this.sprite.getWidth()/2), centerY,
-                centerX-130, centerY+40,
-                centerX-110, centerY+65,
-                centerX-75, centerY+(this.sprite.getHeight()/2),
-                centerX, centerY+(this.sprite.getHeight()/2),
-                centerX+75, centerY+(this.sprite.getHeight()/2),
-                centerX+110, centerY+65,
-                centerX+130, centerY+40,
-                centerX+(this.sprite.getWidth()/2), centerY,
-                centerX+130, centerY-40,
-                centerX+110, centerY-65,
-                centerX+75, centerY-(this.sprite.getHeight()/2),
-                centerX, centerY-(this.sprite.getHeight()/2),
-                centerX-75, centerY-(this.sprite.getHeight()/2),
-                centerX-110, centerY-65,
-                centerX-130, centerY-40};
+                Play.CENTER_X - (this.sprite.getWidth()/2), Play.CENTER_Y,
+                Play.CENTER_X - 130, Play.CENTER_Y + 40,
+                Play.CENTER_X - 110, Play.CENTER_Y + 65,
+                Play.CENTER_X - 75, Play.CENTER_Y + (this.height/2),
+                Play.CENTER_X, Play.CENTER_Y + (this.height/2),
+                Play.CENTER_X + 75, Play.CENTER_Y + (this.height/2),
+                Play.CENTER_X + 110, Play.CENTER_Y + 65,
+                Play.CENTER_X + 130, Play.CENTER_Y + 40,
+                Play.CENTER_X +(this.sprite.getWidth()/2), Play.CENTER_Y,
+                Play.CENTER_X + 130, Play.CENTER_Y -40,
+                Play.CENTER_X + 110, Play.CENTER_Y -65,
+                Play.CENTER_X + 75, Play.CENTER_Y -(this.height/2),
+                Play.CENTER_X, Play.CENTER_Y -(this.height/2),
+                Play.CENTER_X - 75, Play.CENTER_Y -(this.height/2),
+                Play.CENTER_X - 110, Play.CENTER_Y - 65,
+                Play.CENTER_X - 130, Play.CENTER_Y - 40
+        };
 
         this.bounds = new Polygon(points);
+        this.bounds.setCenterX(x);
+        this.bounds.setCenterY(y);
     }
 
 
-    public void trackMouse(float targetX, float targetY, float originX, float originY){
-        float opposite = targetY - originY;
-        float adjacent = targetX - originX;
-
-        if(targetX != 0 && targetY !=600){ //Avoid changing the initial direction after the game has started
-            this.angle = (float) Math.toDegrees(Math.atan2(opposite, adjacent));
-            float radian = (float) Math.toRadians(this.angle);
-
-            this.initBounds();
-            this.bounds  = this.bounds.transform(Transform.createRotateTransform(radian));
-        }
+    /** RENDERING TO MAP **/
+    public void render(){
+        sprite.drawCentered(Play.mapX+this.posX, Play.mapY+this.posY);
+        this.renderBounds(Play.mapX+this.posX, Play.mapY+this.posY, Color.red);
     }
 
-    public int getCarHeight(){
-       return this.sprite.getHeight();
+    public void renderFixed(){
+        sprite.setRotation(this.angle);
+        sprite.drawCentered(Play.OFFSET_X, Play.OFFSET_Y);
+        this.renderBounds(Play.OFFSET_X, Play.OFFSET_Y, Color.red);
     }
 
-    public int getCarWidth(){
-        return this.sprite.getHeight();
-    }
+    public void renderBounds(float centerX, float centerY, Color color){
 
-    public float getPositionX(){
-        return this.posX;
-    }
+        //Set center for bounding polygon
+        this.bounds.setCenterX(centerX);
+        this.bounds.setCenterY(centerY);
 
-    public float getPositionY(){
-        return this.posY;
-    }
-    public void setPositionX(float newPosX){
-        this.posX = newPosX;
-    }
-
-    public void setPositionY(float newPosY){
-        this.posY = newPosY;
-    }
-
-    private void drawBounds(Color color, Graphics graphics){
-        this.bounds.setCenterX(Game.SCREEN_WIDTH/2);
-        this.bounds.setCenterY(Game.SCREEN_HEIGHT/2);
-
+        //Render bounding polygon
+        Graphics graphics = new Graphics();
         graphics.setColor(color);
         graphics.draw(this.bounds);
     }
 
-    public Shape getBounds(){
-        return this.bounds;
-    }
+
+
+
+//    public void render(float xPos, float yPos, Graphics graphics) throws SlickException{
+//        graphics.drawString("x: " + this.posX + " y: " + this.posY, 400, 10);
+//        graphics.drawString("sX: " + Play.OFFSET_X + " sY: " + Play.OFFSET_Y, 400, 30);
+//
+//
+//        //Render Car
+//        sprite.setRotation(this.angle);
+//        sprite.drawCentered(600, Play.OFFSET_Y);
+//    }
+
+
+//
+//
+//    public void trackMouse(float targetX, float targetY, float originX, float originY){
+//        float opposite = targetY - originY;
+//        float adjacent = targetX - originX;
+//
+//        if(targetX != 0 && targetY !=600){ //Avoid changing the initial direction after the game has started
+//            this.angle = (float) Math.toDegrees(Math.atan2(opposite, adjacent));
+//            float radian = (float) Math.toRadians(this.angle);
+//
+//            this.initBounds();
+//            this.bounds  = this.bounds.transform(Transform.createRotateTransform(radian));
+//        }
+//    }
+//
+//
+//
+//    private void drawBounds(Color color, Graphics graphics){
+//        this.bounds.setCenterX(Game.SCREEN_WIDTH/2);
+//        this.bounds.setCenterY(Game.SCREEN_HEIGHT/2);
+//
+
+//    }
+
 }
