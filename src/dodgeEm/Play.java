@@ -7,6 +7,13 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.state.*;
+import org.newdawn.slick.tests.xml.Inventory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Play extends BasicGameState {
 
@@ -33,11 +40,12 @@ public class Play extends BasicGameState {
     private Car car = null;
     private Car myCar = null;
 
-    private PowerUp health;
+    private HashMap<Integer, PowerUp> powerUps;
 
     public Play(int state) {
-        this.car = new Car("Rain", 1);
-        this.myCar = new Car("My Car", 1);
+        car = new Car("Rain", 1);
+        myCar = new Car("My Car", 1);
+        powerUps = new HashMap<>();
     }
 
     @Override
@@ -50,9 +58,8 @@ public class Play extends BasicGameState {
         /**INITIALIZE MAP **/
         map = new Image("res/map.png").getScaledCopy(0.6f);
 
-
         /** INITIALIZE POWER UP **/
-        health = new Health(1000, 1000);
+//        health = new Health(1000, 1000);
 
         /** INITIALIZE OTHER BUMPER CARS **/
         car.init(650, 500);
@@ -60,8 +67,8 @@ public class Play extends BasicGameState {
         /** INITIALIZE MY CAR **/
         myCar.init(0, 0);
 
-
-    }
+        powerUps.put(0, new Health(1000, 1000));
+   }
 
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
@@ -69,7 +76,9 @@ public class Play extends BasicGameState {
         map.draw(mapX, mapY);
 
         /** RENDERING OF POWER UPS **/
-        health.render();
+        for(Integer i: powerUps.keySet()){
+            powerUps.get(i).render();
+        }
 
         /**RENDERING OF BUMPER CARS */
         car.render();
@@ -77,6 +86,8 @@ public class Play extends BasicGameState {
 
         /** CURRENT LOCATION OF MY CAR **/
         graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
+
+
     }
 
     @Override
@@ -89,6 +100,20 @@ public class Play extends BasicGameState {
 
         /** PLAY USING MOUSE **/
         playCursor(delta);
+
+        for(Integer i: powerUps.keySet()){
+            if(myCar.bounds.intersects(powerUps.get(i).bounds)){
+               myCar.use((Health) powerUps.get(i));
+               powerUps.remove(i);
+            }
+        }
+
+
+
+
+
+
+
     }
 
 
@@ -130,40 +155,26 @@ public class Play extends BasicGameState {
         if(input.isKeyDown(Input.KEY_LEFT)){
             myCar.posX -=1;
             mapX = -(myCar.posX - Play.OFFSET_X);
-
-            System.out.println("CAR x: " + myCar.posX + " y: " + myCar.posY);
-            System.out.println("MAP x: " + mapX + " y: " + mapY);
-
-            System.out.println();
         }
         if(input.isKeyDown(Input.KEY_RIGHT)){
             myCar.posX +=1;
             mapX = -(myCar.posX - Play.OFFSET_X);
-
-            System.out.println("CAR x: " + myCar.posX + " y: " + myCar.posY);
-            System.out.println("MAP x: " + mapX + " y: " + mapY);
-
-            System.out.println();
         }
 
         if(input.isKeyDown(Input.KEY_UP)){
             myCar.posY -=1;
             mapY = -(myCar.posY - Play.OFFSET_Y);
-
-            System.out.println("CAR x: " + myCar.posX + " y: " + myCar.posY);
-            System.out.println("MAP x: " + mapX + " y: " + mapY);
-
-            System.out.println();
         }
 
         if(input.isKeyDown(Input.KEY_DOWN)){
             myCar.posY +=1;
             mapY = -(myCar.posY - Play.OFFSET_Y);
-
             System.out.println("CAR x: " + myCar.posX + " y: " + myCar.posY);
             System.out.println("MAP x: " + mapX + " y: " + mapY);
 
             System.out.println();
         }
+
+
     }
 }

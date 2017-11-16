@@ -13,7 +13,7 @@ public class Car {
 
     /** HEALTH **/
     private int hp;
-    private int totalHp;
+    private int maxHp;
 
     /** POSITIONING AND DIRECTION **/
     protected float posX;
@@ -28,13 +28,14 @@ public class Car {
     private Image sprite;
     protected Shape bounds;
 
+    protected PowerUp item;
 
     public Car(String name, int color){ }
 
     public void init(float x, float y) throws SlickException{
         /** HEALTH **/
         this.hp = 50;
-        this.totalHp = 100;
+        this.maxHp = 100;
 
         /** CAR POSITIONING AND DIRECTION **/
         this.posX = x;
@@ -50,6 +51,8 @@ public class Car {
         this.width = this.sprite.getWidth();
         this.height = this.sprite.getHeight();
         this.initBounds(x, y);
+
+        this.item = null;
 
     }
 
@@ -105,5 +108,14 @@ public class Car {
         Graphics graphics = new Graphics();
         graphics.setColor(color);
         graphics.draw(this.bounds);
+    }
+
+    public void use(Health health){
+        if(this.hp + health.potency > this.maxHp){
+            this.hp = this.maxHp;
+        }
+        else{
+            this.hp += health.potency;
+        }
     }
 }
