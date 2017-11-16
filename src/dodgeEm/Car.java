@@ -2,10 +2,7 @@ package dodgeEm;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
-import org.newdawn.slick.geom.Polygon;
-import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
-import org.newdawn.slick.geom.Transform;
+import org.newdawn.slick.geom.*;
 import org.newdawn.slick.state.*;
 
 
@@ -94,6 +91,7 @@ public class Car {
         sprite.setRotation(this.angle);
         sprite.drawCentered(Play.OFFSET_X, Play.OFFSET_Y);
         this.renderBounds(Play.OFFSET_X, Play.OFFSET_Y, Color.red);
+        this.renderHealth(Play.OFFSET_X, Play.OFFSET_Y + (this.height/2));
     }
 
     public void renderBounds(float centerX, float centerY, Color color){
@@ -108,6 +106,21 @@ public class Car {
         Graphics graphics = new Graphics();
         graphics.setColor(color);
         graphics.draw(this.bounds);
+    }
+
+    public void renderHealth(float centerX, float centerY){
+        Graphics graphics = new Graphics();
+
+        /** EXPAND MAX HP HEALTH BAR WIDTH **/
+        float barWidth = this.maxHp * 1.5f;
+
+        /** MAX HEALTH BAR **/
+        graphics.setColor(Color.red);
+        graphics.fillRoundRect(centerX-(barWidth/2), centerY, barWidth, 10,20);
+
+        /** CURRENT HEALTH BAR **/
+        graphics.setColor(Color.green);
+        graphics.fillRoundRect(centerX-(barWidth/2), centerY, this.hp * 1.5f, 10,20);
     }
 
     public void use(Health health){
