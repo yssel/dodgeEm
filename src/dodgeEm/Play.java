@@ -11,6 +11,7 @@ import org.newdawn.slick.tests.xml.Inventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,12 +41,12 @@ public class Play extends BasicGameState {
     private Car car = null;
     private Car myCar = null;
 
-    private HashMap<Integer, PowerUp> powerUps;
+    private ConcurrentHashMap<Integer, PowerUp> powerUps;
 
     public Play(int state) {
         car = new Car("Rain", 1);
         myCar = new Car("My Car", 1);
-        powerUps = new HashMap<>();
+        powerUps = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -67,7 +68,10 @@ public class Play extends BasicGameState {
         /** INITIALIZE MY CAR **/
         myCar.init(0, 0);
 
-        powerUps.put(0, new Health(1000, 1000));
+        for(int i=0; i<10; i++){
+            Random rand = new Random();
+            powerUps.put(i, new Health(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+        }
    }
 
     @Override
