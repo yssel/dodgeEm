@@ -46,11 +46,11 @@ public class Play extends BasicGameState {
         powerUps = new ConcurrentHashMap<>();
 
         /** INITIALIZE OTHER BUMPER CARS **/
-        car = new Car("Player 2", 1);
+        car = new Car("Yssel", 1, 0);
         car.init(650, 500);
 
         /** INITIALIZE MY CAR **/
-        myCar = new Car(MainMenu.name, MainMenu.carColor);
+        myCar = new Car(MainMenu.name, MainMenu.carColor, 270);
         myCar.init(0, 0);
 
         /** RANDOMIZE POWER UPS **/

@@ -2,6 +2,10 @@ package dodgeEm;
 
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.*;
+import org.newdawn.slick.util.ResourceLoader;
+
+import java.awt.Font;
+import java.io.InputStream;
 
 public class Game extends StateBasedGame {
 
@@ -37,6 +41,16 @@ public class Game extends StateBasedGame {
         }catch (SlickException e){
             e.printStackTrace();
         }
+    }
 
+    public static TrueTypeFont loadFont(String res, float size){
+        try {
+            InputStream inputStream	= ResourceLoader.getResourceAsStream(res);
+            Font font = java.awt.Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            font = font.deriveFont(size); // set font size
+            return new TrueTypeFont(font, false);
+
+        } catch (Exception e) {}
+        return null;
     }
 }

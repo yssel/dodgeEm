@@ -5,6 +5,7 @@ import org.newdawn.slick.geom.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static dodgeEm.Game.loadFont;
 
 public class Car {
 
@@ -33,10 +34,12 @@ public class Car {
     protected Shape bounds;
 
     protected PowerUp item;
+    private TrueTypeFont font;
 
-    public Car(String name, int color){
+    public Car(String name, int color, float angle){
         this.name = name;
         this.color = color;
+        this.angle = angle;
     }
 
     public void init(float x, float y) throws SlickException{
@@ -51,7 +54,6 @@ public class Car {
         /** CAR POSITIONING AND DIRECTION **/
         this.posX = x;
         this.posY = y;
-        this.angle = 270;
 
         /** MAP POSITIONING **/
         Play.mapX = this.posX + Play.OFFSET_X;
@@ -59,14 +61,14 @@ public class Car {
 
         /** VISUALIZATION AND SIZING **/
 
+        this.font = loadFont("res/zig.ttf", 25f);
         this.sprite = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0)
                 .getSprite(this.color, 0)
-                .getScaledCopy(new Float(0.13f));
+                .getScaledCopy(0.13f);
 
         this.width = this.sprite.getWidth();
         this.height = this.sprite.getHeight();
         this.initBounds(x, y);
-
     }
 
     /** INITIALIZE BOUNDING POLYGON **/
@@ -99,8 +101,9 @@ public class Car {
     /** RENDERING TO MAP **/
     public void render(){
         sprite.setRotation(this.angle);
-        sprite.drawCentered(Play.mapX+this.posX, Play.mapY+this.posY);
-        this.renderBounds(Play.mapX+this.posX, Play.mapY+this.posY, Color.red);
+        sprite.drawCentered(Play.mapX + this.posX, Play.mapY + this.posY);
+        this.renderBounds(Play.mapX + this.posX, Play.mapY + this.posY, Color.red);
+        this.renderName(Play.mapX +(this.posX - (this.font.getWidth(this.name)/2)), Play.mapY + (this.posY - 120));
     }
 
     public void renderFixed(){
@@ -108,6 +111,13 @@ public class Car {
         sprite.drawCentered(Play.OFFSET_X, Play.OFFSET_Y);
         this.renderBounds(Play.OFFSET_X, Play.OFFSET_Y, Color.red);
         this.renderHealth(Play.OFFSET_X, Play.OFFSET_Y + (this.height/2));
+        this.renderName(Game.CENTER_X - (this.font.getWidth(this.name)/2), Game.CENTER_Y - 120);
+    }
+
+    public void renderName(float x, float y){
+        Graphics graphics = new Graphics();
+        graphics.setFont(this.font);
+        graphics.drawString(this.name, x, y);
     }
 
     public void renderBounds(float centerX, float centerY, Color color){
