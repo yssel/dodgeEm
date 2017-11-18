@@ -17,6 +17,7 @@ public class Car {
 
     /** SPEED **/
     protected float speed;
+    protected float maxSpeed;
 
     /** POSITIONING AND DIRECTION **/
     protected float posX;
@@ -42,6 +43,7 @@ public class Car {
 
         /** BUMPER CAR SPEED **/
         this.speed = 5f;
+        this.maxSpeed = this.speed;
 
         /** CAR POSITIONING AND DIRECTION **/
         this.posX = x;
@@ -137,11 +139,33 @@ public class Car {
     }
 
     public void usePowerUp(PowerUp powerUp){
+
+        /** OVERRIDE THE EFFECTIVITY OF PREVIOUS ITEM **/
+        if(this.item != null){
+            if(this.item instanceof Gum){
+                Gum gum = (Gum) this.item;
+                gum.timer.cancel();
+                System.out.println("CANCELLEDT GUM");
+            }
+            else if(this.item instanceof Boost){
+                Boost boost = (Boost) this.item;
+                boost.timer.cancel();
+                System.out.println("CANCELLEDT BOOST");
+            }
+        }
+
+        /** STORE POWER UP AS AN ITEM OF CAR **/
+        this.item = powerUp;
+
+        /** INVOKES DIFFERENT METHODS FOR EACH ITEM **/
         if(powerUp instanceof Health){
-            this.use((Health) powerUp);
+            this.use((Health) this.item);
         }
         else if(powerUp instanceof Gum){
-            this.use((Gum) powerUp);
+            this.use((Gum) this.item);
+        }
+        else if(powerUp instanceof Boost){
+            this.use((Boost) this.item);
         }
     }
 
@@ -156,19 +180,40 @@ public class Car {
 
 
     public void use(Gum gum){
-        float oldSpeed = this.speed;
-        final Timer timer = new Timer();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
+        gum.timer = new Timer();
+        gum.timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 System.out.println(gum.duration);
                 gum.duration -= 1;
-                Car.this.speed *= gum.speedBonus;
+
+                Car.this.speed = Car.this.maxSpeed * gum.speedBonus; //Slows down the car (speedBonus < 1)
+
                 if (gum.duration < 0) {
-                    Car.this.speed = oldSpeed;
-                    timer.cancel();
+                    gum.timer.cancel();
+                    Car.this.speed = Car.this.maxSpeed;
+                    Car.this.item = null;
                 }
             }
         }, 0, 1000);
     }
+
+    public void use(Boost boost){
+        boost.timer = new Timer();
+        boost.timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                System.out.println(boost.duration);
+                boost.duration -= 1;
+
+                Car.this.speed = Car.this.maxSpeed * boost.speedBonus; //Speeds up the car (speedBonus > 1)
+
+                if (boost.duration < 0) {
+                    boost.timer.cancel();
+                    Car.this.speed = Car.this.maxSpeed;
+                    Car.this.item = null;
+                }
+        }
+        }, 0, 1000);
+    }
+
+
 }
