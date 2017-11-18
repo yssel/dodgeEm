@@ -1,26 +1,12 @@
 package dodgeEm;
 
-import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
-import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Shape;
-import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.state.*;
-import org.newdawn.slick.tests.xml.Inventory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Play extends BasicGameState {
-
-    /** GAME WINDOW SIZE **/
-    public static final float CENTER_X = 400;
-    public static final float CENTER_Y = 300;
 
     /** OFFSET FOR MY CAR **/
     public static final float OFFSET_X = 400;
@@ -44,9 +30,6 @@ public class Play extends BasicGameState {
     private ConcurrentHashMap<Integer, PowerUp> powerUps;
 
     public Play(int state) {
-        car = new Car("Rain", 1);
-        myCar = new Car("My Car", 1);
-        powerUps = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -60,12 +43,14 @@ public class Play extends BasicGameState {
         map = new Image("res/map.png").getScaledCopy(0.6f);
 
         /** INITIALIZE POWER UP **/
-//        health = new Health(1000, 1000);
+        powerUps = new ConcurrentHashMap<>();
 
         /** INITIALIZE OTHER BUMPER CARS **/
+        car = new Car("Player 2", 1);
         car.init(650, 500);
 
         /** INITIALIZE MY CAR **/
+        myCar = new Car(MainMenu.name, MainMenu.carColor);
         myCar.init(0, 0);
 
         /** RANDOMIZE POWER UPS **/
@@ -124,18 +109,11 @@ public class Play extends BasicGameState {
             }
         }
 
-
-
-
-
-
-
     }
 
-
     public void trackCursor(float targetX, float targetY){
-        float opposite = targetY - Play.CENTER_Y;
-        float adjacent = targetX - Play.CENTER_X;
+        float opposite = targetY - Game.CENTER_Y;
+        float adjacent = targetX - Game.CENTER_X;
 
         /** ROTATION OF MY BUMPER CAR **/
         myCar.angle = (float) Math.toDegrees(Math.atan2(opposite, adjacent));
@@ -145,21 +123,21 @@ public class Play extends BasicGameState {
         trackCursor(this.cursorX, this.cursorY);
 
         //Point cursor up and down
-        if(this.cursorY < CENTER_Y){
+        if(this.cursorY < Game.CENTER_Y){
             myCar.posY -= (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
         }
-        if(this.cursorY > CENTER_Y){
+        if(this.cursorY > Game.CENTER_Y){
             myCar.posY += (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
         }
 
         //Point cursor left and right
-        if(this.cursorX < CENTER_X){
+        if(this.cursorX < Game.CENTER_X){
             myCar.posX -= (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
         }
-        if(this.cursorX > CENTER_X){
+        if(this.cursorX > Game.CENTER_X){
             myCar.posX += (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
         }

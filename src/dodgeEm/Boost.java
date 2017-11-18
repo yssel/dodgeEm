@@ -1,7 +1,6 @@
 package dodgeEm;
 
 import org.newdawn.slick.SlickException;
-
 import java.util.Timer;
 
 public class Boost extends PowerUp{
