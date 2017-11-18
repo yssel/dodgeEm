@@ -8,7 +8,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
 public abstract class PowerUp  {
-    protected float time;
+    protected float duration;
     protected Image sprite;
     protected Shape bounds;
     protected float x, y;
