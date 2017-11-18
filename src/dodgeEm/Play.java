@@ -68,9 +68,10 @@ public class Play extends BasicGameState {
         /** INITIALIZE MY CAR **/
         myCar.init(0, 0);
 
-        for(int i=0; i<10; i++){
+        /** RANDOMIZE POWER UPS **/
+        for(int i=0; i<20; i++){
             Random rand = new Random();
-            switch(rand.nextInt(2)){
+            switch(rand.nextInt(3)){
                 case 0:
                     powerUps.put(i, new Health(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
                     break;
@@ -78,7 +79,7 @@ public class Play extends BasicGameState {
                     powerUps.put(i, new Gum(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
                     break;
                 case 2:
-                    powerUps.put(i, new Gum(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    powerUps.put(i, new Boost(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
                     break;
             }
 
