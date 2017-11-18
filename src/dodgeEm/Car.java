@@ -5,12 +5,18 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.geom.*;
 import org.newdawn.slick.state.*;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class Car {
 
     /** HEALTH **/
     private int hp;
     private int maxHp;
+
+    /** SPEED **/
+    protected float speed;
 
     /** POSITIONING AND DIRECTION **/
     protected float posX;
@@ -34,6 +40,9 @@ public class Car {
         this.hp = 50;
         this.maxHp = 100;
 
+        /** BUMPER CAR SPEED **/
+        this.speed = 5f;
+
         /** CAR POSITIONING AND DIRECTION **/
         this.posX = x;
         this.posY = y;
@@ -48,8 +57,6 @@ public class Car {
         this.width = this.sprite.getWidth();
         this.height = this.sprite.getHeight();
         this.initBounds(x, y);
-
-        this.item = null;
 
     }
 
@@ -123,6 +130,21 @@ public class Car {
         graphics.fillRoundRect(centerX-(barWidth/2), centerY, this.hp * 1.5f, 10,20);
     }
 
+
+    public void move(float destX, float destY){
+        this.posX = destX;
+        this.posY = destY;
+    }
+
+    public void usePowerUp(PowerUp powerUp){
+        if(powerUp instanceof Health){
+            this.use((Health) powerUp);
+        }
+        else if(powerUp instanceof Gum){
+            this.use((Gum) powerUp);
+        }
+    }
+
     public void use(Health health){
         if(this.hp + health.potency > this.maxHp){
             this.hp = this.maxHp;
@@ -130,5 +152,23 @@ public class Car {
         else{
             this.hp += health.potency;
         }
+    }
+
+
+    public void use(Gum gum){
+        float oldSpeed = this.speed;
+        final Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                System.out.println(gum.duration);
+                gum.duration -= 1;
+                Car.this.speed *= gum.speedBonus;
+                if (gum.duration < 0) {
+                    Car.this.speed = oldSpeed;
+                    timer.cancel();
+                }
+            }
+        }, 0, 1000);
     }
 }

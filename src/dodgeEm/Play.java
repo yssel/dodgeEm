@@ -70,7 +70,18 @@ public class Play extends BasicGameState {
 
         for(int i=0; i<10; i++){
             Random rand = new Random();
-            powerUps.put(i, new Health(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+            switch(rand.nextInt(2)){
+                case 0:
+                    powerUps.put(i, new Health(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    break;
+                case 1:
+                    powerUps.put(i, new Gum(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    break;
+                case 2:
+                    powerUps.put(i, new Gum(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    break;
+            }
+
         }
    }
 
@@ -107,8 +118,8 @@ public class Play extends BasicGameState {
 
         for(Integer i: powerUps.keySet()){
             if(myCar.bounds.intersects(powerUps.get(i).bounds)){
-               myCar.use((Health) powerUps.get(i));
-               powerUps.remove(i);
+                myCar.usePowerUp(powerUps.get(i));
+                powerUps.remove(i);
             }
         }
 
@@ -134,21 +145,21 @@ public class Play extends BasicGameState {
 
         //Point cursor up and down
         if(this.cursorY < CENTER_Y){
-            myCar.posY -= (delta * 0.1f + 1);
+            myCar.posY -= (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
         }
         if(this.cursorY > CENTER_Y){
-            myCar.posY += (delta * 0.1f + 1);
+            myCar.posY += (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
         }
 
         //Point cursor left and right
         if(this.cursorX < CENTER_X){
-            myCar.posX -= (delta * 0.1f + 1);
+            myCar.posX -= (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
         }
         if(this.cursorX > CENTER_X){
-            myCar.posX += (delta * 0.1f + 1);
+            myCar.posX += (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
         }
     }
