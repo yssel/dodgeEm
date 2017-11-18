@@ -1,10 +1,7 @@
 package dodgeEm;
-import org.lwjgl.Sys;
-import org.lwjgl.input.Mouse;
+
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.*;
-import org.newdawn.slick.state.*;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,13 +25,19 @@ public class Car {
     private float width;
     private float height;
 
+    private String name;
+    private int color;
+
     /** VISUALIZATION **/
     private Image sprite;
     protected Shape bounds;
 
     protected PowerUp item;
 
-    public Car(String name, int color){ }
+    public Car(String name, int color){
+        this.name = name;
+        this.color = color;
+    }
 
     public void init(float x, float y) throws SlickException{
         /** HEALTH **/
@@ -55,7 +58,11 @@ public class Car {
         Play.mapY = this.posY + Play.OFFSET_Y;
 
         /** VISUALIZATION AND SIZING **/
-        this.sprite = new Image("res/red-car.png").getScaledCopy(new Float(0.13));
+
+        this.sprite = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0)
+                .getSprite(this.color, 0)
+                .getScaledCopy(new Float(0.13f));
+
         this.width = this.sprite.getWidth();
         this.height = this.sprite.getHeight();
         this.initBounds(x, y);
@@ -65,22 +72,22 @@ public class Car {
     /** INITIALIZE BOUNDING POLYGON **/
     public void initBounds(float x, float y){
         float[] points = {
-                Play.CENTER_X - (this.sprite.getWidth()/2), Play.CENTER_Y,
-                Play.CENTER_X - 130, Play.CENTER_Y + 40,
-                Play.CENTER_X - 110, Play.CENTER_Y + 65,
-                Play.CENTER_X - 75, Play.CENTER_Y + (this.height/2),
-                Play.CENTER_X, Play.CENTER_Y + (this.height/2),
-                Play.CENTER_X + 75, Play.CENTER_Y + (this.height/2),
-                Play.CENTER_X + 110, Play.CENTER_Y + 65,
-                Play.CENTER_X + 130, Play.CENTER_Y + 40,
-                Play.CENTER_X +(this.sprite.getWidth()/2), Play.CENTER_Y,
-                Play.CENTER_X + 130, Play.CENTER_Y -40,
-                Play.CENTER_X + 110, Play.CENTER_Y -65,
-                Play.CENTER_X + 75, Play.CENTER_Y -(this.height/2),
-                Play.CENTER_X, Play.CENTER_Y -(this.height/2),
-                Play.CENTER_X - 75, Play.CENTER_Y -(this.height/2),
-                Play.CENTER_X - 110, Play.CENTER_Y - 65,
-                Play.CENTER_X - 130, Play.CENTER_Y - 40
+                Game.CENTER_X - (this.sprite.getWidth()/2), Game.CENTER_Y,
+                Game.CENTER_X - 130, Game.CENTER_Y + 40,
+                Game.CENTER_X - 110, Game.CENTER_Y + 65,
+                Game.CENTER_X - 75, Game.CENTER_Y + (this.height/2),
+                Game.CENTER_X, Game.CENTER_Y + (this.height/2),
+                Game.CENTER_X + 75, Game.CENTER_Y + (this.height/2),
+                Game.CENTER_X + 110, Game.CENTER_Y + 65,
+                Game.CENTER_X + 130, Game.CENTER_Y + 40,
+                Game.CENTER_X +(this.sprite.getWidth()/2), Game.CENTER_Y,
+                Game.CENTER_X + 130, Game.CENTER_Y -40,
+                Game.CENTER_X + 110, Game.CENTER_Y -65,
+                Game.CENTER_X + 75, Game.CENTER_Y -(this.height/2),
+                Game.CENTER_X, Game.CENTER_Y -(this.height/2),
+                Game.CENTER_X - 75, Game.CENTER_Y -(this.height/2),
+                Game.CENTER_X - 110, Game.CENTER_Y - 65,
+                Game.CENTER_X - 130, Game.CENTER_Y - 40
         };
 
         this.bounds = new Polygon(points);

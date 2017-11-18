@@ -1,6 +1,5 @@
 package dodgeEm;
 
-import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.*;
 
@@ -9,8 +8,12 @@ public class Game extends StateBasedGame {
     public static final String GAME_NAME = "Dodge 'Em";
     public static final int MENU = 0;
     public static final int PLAY = 1;
+
+    /** GAME WINDOW SIZE **/
     public static final int SCREEN_WIDTH = 800;
     public static final int SCREEN_HEIGHT = 600;
+    public static final float CENTER_X = 400;
+    public static final float CENTER_Y = 300;
 
     public Game(String title){
         super(title);
@@ -21,9 +24,7 @@ public class Game extends StateBasedGame {
     @Override
     public void initStatesList(GameContainer gameContainer) throws SlickException {
         this.getState(MENU).init(gameContainer, this);
-        this.getState(PLAY).init(gameContainer, this);
-        this.enterState(PLAY);
-
+        this.enterState(MENU);
     }
 
     public static void main(String[] args){

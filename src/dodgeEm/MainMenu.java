@@ -5,18 +5,23 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.state.*;
 
 public class MainMenu extends BasicGameState {
-    private String mouse = "No input yet!";
-    private int xPos = 0;
-    private int yPos = 0;
-    private SpriteSheet spriteSheet = null;
-    private Image colorpicker = null;
-    Image car = null;
-    int carColor = 0;
 
-    public MainMenu(int state){
+    /** CURSOR LOCATION **/
+    private int xPos;
+    private int yPos;
 
-    }
+    /** MAIN MENU GRAPHICS **/
+    private Image car;
+    private Image map;
+    private Image arrow;
+    private SpriteSheet spriteSheet;
 
+
+    /** PLAYER INFO **/
+    public static int carColor;
+    public static String name;
+
+    public MainMenu(int state){ }
 
     @Override
     public int getID() {
@@ -25,57 +30,63 @@ public class MainMenu extends BasicGameState {
 
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
-        spriteSheet = new SpriteSheet("res/car1-sprites.png", 190, 190, 10);
-        colorpicker = new Image("res/color-picker.png").getScaledCopy(250, 42);
+        this.spriteSheet = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0);
+        this.map = new Image("res/map.png").getScaledCopy(0.6f);
+        this.arrow = new Image("res/arrow.png").getScaledCopy(0.15f);
+        this.name = "Player";
+        this.carColor = 0;
     }
 
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
-        graphics.drawString(this.mouse, gameContainer.getWidth()/2, 20);
 
-        //Render title
-        graphics.drawString(Game.GAME_NAME, (gameContainer.getWidth()/2) - new Float(42), 100);
+        /** MAIN MENU BACKGROUND **/
+        map.draw(0, 0);
 
-        //Render bumper car
-        car = spriteSheet.getSprite(6,carColor);
-        car.draw((gameContainer.getWidth()/2)-(car.getWidth()/2), 100);
-        System.out.println("x: " + this.xPos + " y: " + this.yPos);
+        /** CHANGE COLOR BUTTONS **/
+        arrow.setRotation(0);
+        arrow.drawCentered(Game.CENTER_X - 180, Game.CENTER_Y);
+        arrow.setRotation(180);
+        arrow.drawCentered(Game.CENTER_X + 180, Game.CENTER_Y);
 
+        /** BUMPER CAR **/
+        car = spriteSheet.getSprite(this.carColor, 0).getScaledCopy(new Float(0.13f));
+        car.drawCentered(Game.CENTER_X, Game.CENTER_Y);
 
-        colorpicker.draw((gameContainer.getWidth()/2)-(colorpicker.getWidth()/2), 350);
+        graphics.drawString("x: " + this.xPos + " y: " + this.yPos, Game.CENTER_X, 20);
+        graphics.drawString("Start game", Game.CENTER_X, 500);
     }
 
     @Override
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int i) throws SlickException {
-        int xPos = Mouse.getX();
-        int yPos = Mouse.getY();
+        Input input = gameContainer.getInput();
 
-        if(yPos>207 && yPos<253){
-            if(xPos > 270 && xPos < 316){
-                changeCarColor(0);
-            }
-            else if(xPos > 326 && xPos < 368){
-                changeCarColor(1);
-            }
-            else if(xPos > 376 && xPos < 426){
-                changeCarColor(2);
-            }
-            else if(xPos > 430 && xPos < 475){
-                changeCarColor(3);
-            }
-            else if(xPos > 480 && xPos < 520){
-                changeCarColor(4);
+        /** CHANGE COLOR LEFT BUTTON **/
+        if(this.xPos > 200 && this.xPos <237 && this.yPos > 270 && this.yPos < 333){
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                this.carColor = (this.carColor) - 1 < 0 ? 4 : (this.carColor - 1);
             }
         }
-//        this.xPos = Mouse.getX();
-//        this.yPos = Mouse.getY();
 
-//        mouse = "Mouse position x: " + xpos  + " y: " + ypos;
-    }
+        /** CHANGE COLOR RIGHT BUTTON **/
+        if(this.xPos > 560 && this.xPos <597 && this.yPos > 270 && this.yPos < 333){
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                this.carColor = (this.carColor) + 1 > 4 ? 0 : (this.carColor + 1);
 
-    public void changeCarColor(int color){
-        if(Mouse.isButtonDown(0)){
-            this.carColor = color;
+            }
         }
+
+        /** START GAME BUTTON **/
+        if(this.xPos > 397 && this.xPos < 493 && this.yPos > 80 && this.yPos <100){
+            if(Mouse.isButtonDown(0)){
+                stateBasedGame.getState(Game.PLAY).init(gameContainer, stateBasedGame);
+                stateBasedGame.enterState(Game.PLAY);
+            }
+        }
+
+        /** GET CURSOR LOCATION **/
+        this.xPos = Mouse.getX();
+        this.yPos = Mouse.getY();
     }
+
 }
