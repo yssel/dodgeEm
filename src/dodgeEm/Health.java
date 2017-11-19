@@ -1,6 +1,5 @@
 package dodgeEm;
 
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class Health extends PowerUp{

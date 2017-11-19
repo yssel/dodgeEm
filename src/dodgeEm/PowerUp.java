@@ -1,6 +1,5 @@
 package dodgeEm;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -8,7 +7,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
 public abstract class PowerUp  {
-    protected float time;
+    protected float duration;
     protected Image sprite;
     protected Shape bounds;
     protected float x, y;
