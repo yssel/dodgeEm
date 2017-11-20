@@ -62,7 +62,7 @@ public class Play extends BasicGameState {
 
         /** INITIALIZE MY CAR **/
         myCar = new Car(MainMenu.name, MainMenu.carColor, 180);
-        myCar.init(500, 3000);
+        myCar.init(1000, 1000);
 
         /** INITIALIZE MAP ARENA BOUNDS **/
         initArenaBounds();
@@ -145,7 +145,7 @@ public class Play extends BasicGameState {
         if(this.cursorY < Game.CENTER_Y){
             myCar.posY -= (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
-            if(bounds.get("TOP").intersects(myCar.bounds)){
+            if(bounds.get("TOP").intersects(myCar.bounds) || car.collidedWith(myCar)){
                 myCar.posY += 100;
                 mapY = -(myCar.posY - Play.OFFSET_Y);
             }
@@ -153,7 +153,7 @@ public class Play extends BasicGameState {
         if(this.cursorY > Game.CENTER_Y){
             myCar.posY += (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
-            if(bounds.get("BOTTOM").intersects(myCar.bounds)){
+            if(bounds.get("BOTTOM").intersects(myCar.bounds) || car.collidedWith(myCar)){
                 myCar.posY -= 100;
                 mapY = -(myCar.posY - Play.OFFSET_Y);
             }
@@ -163,7 +163,7 @@ public class Play extends BasicGameState {
         if(this.cursorX < Game.CENTER_X){
             myCar.posX -= (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
-            if(bounds.get("LEFT").intersects(myCar.bounds)){
+            if(bounds.get("LEFT").intersects(myCar.bounds) || car.collidedWith(myCar)){
                 myCar.posX += 100;
                 mapX = -(myCar.posX - Play.OFFSET_X);
             }
@@ -171,7 +171,7 @@ public class Play extends BasicGameState {
         if(this.cursorX > Game.CENTER_X){
             myCar.posX += (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
-            if(bounds.get("RIGHT").intersects(myCar.bounds)){
+            if(bounds.get("RIGHT").intersects(myCar.bounds) || car.collidedWith(myCar)){
                 myCar.posX -= 100;
                 mapX = -(myCar.posX - Play.OFFSET_X);
             }

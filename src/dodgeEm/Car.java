@@ -10,8 +10,8 @@ import static dodgeEm.Game.loadFont;
 public class Car {
 
     /** HEALTH **/
-    private int hp;
-    private int maxHp;
+    private float hp;
+    private float maxHp;
 
     /** SPEED **/
     protected float speed;
@@ -23,18 +23,21 @@ public class Car {
     protected float angle;
 
     /** SIZE **/
-    private float width;
-    private float height;
+    protected float width;
+    protected float height;
 
-    private String name;
-    private int color;
+    /** CAR DAMAGE TO OPPONENT **/
+    protected float damage;
 
     /** VISUALIZATION **/
+    private String name;
+    private int color;
     private Image sprite;
     protected Shape bounds;
-
-    protected PowerUp item;
     private TrueTypeFont font;
+
+    /** INVENTORY **/
+    protected PowerUp item;
 
     public Car(String name, int color, float angle){
         this.name = name;
@@ -44,8 +47,8 @@ public class Car {
 
     public void init(float x, float y) throws SlickException{
         /** HEALTH **/
-        this.hp = 50;
-        this.maxHp = 100;
+        this.hp = 100f;
+        this.maxHp = 100f;
 
         /** BUMPER CAR SPEED **/
         this.speed = 5f;
@@ -69,6 +72,9 @@ public class Car {
         this.width = this.sprite.getWidth();
         this.height = this.sprite.getHeight();
         this.initBounds(x, y);
+
+        /** CAR DAMAGE **/
+        this.damage = 0.5f;
     }
 
     /** INITIALIZE BOUNDING POLYGON **/
@@ -103,6 +109,7 @@ public class Car {
         sprite.setRotation(this.angle);
         sprite.drawCentered(Play.mapX + this.posX, Play.mapY + this.posY);
         this.renderBounds(Play.mapX + this.posX, Play.mapY + this.posY, Color.red);
+        this.renderHealth(Play.mapX + this.posX, Play.mapY + this.posY + (this.height/2));
         this.renderName(Play.mapX +(this.posX - (this.font.getWidth(this.name)/2)), Play.mapY + (this.posY - 120));
     }
 
@@ -232,5 +239,30 @@ public class Car {
         }, 0, 1000);
     }
 
+    public boolean collidedWith(Car car){
+        if(this.bounds.intersects(car.bounds) && this.hp > 0){
+            this.hp -= car.damage; //Collision damage when the opponent attacks from side and tail
+
+            /** HEAD TO HEAD COLLISION DAMAGE **/
+            if(this.getHead().intersects(car.getHead())){
+                car.hp -= this.damage;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    public Shape getHead(){
+        float[] head = {
+            this.bounds.getPoint(8)[0], this.bounds.getPoint(8)[1],
+            this.bounds.getPoint(9)[0], this.bounds.getPoint(9)[1],
+            this.bounds.getPoint(10)[0], this.bounds.getPoint(10)[1],
+            this.bounds.getPoint(6)[0], this.bounds.getPoint(6)[1],
+            this.bounds.getPoint(7)[0], this.bounds.getPoint(7)[1]
+        };
+
+        return new Polygon(head);
+    }
 
 }
