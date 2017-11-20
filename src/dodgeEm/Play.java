@@ -68,17 +68,17 @@ public class Play extends BasicGameState {
         initArenaBounds();
 
         /** RANDOMIZE POWER UPS **/
-        for(int i=0; i<20; i++){
+        for(int i=0; i<30; i++){
             Random rand = new Random();
             switch(rand.nextInt(3)){
                 case 0:
-                    powerUps.put(i, new Health(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    powerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
                     break;
                 case 1:
-                    powerUps.put(i, new Gum(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    powerUps.put(i, new Gum(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
                     break;
                 case 2:
-                    powerUps.put(i, new Boost(5 + rand.nextFloat() * (3000 - 5), 5 + rand.nextFloat() * (3000 - 5)));
+                    powerUps.put(i, new Boost(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
                     break;
             }
         }
