@@ -1,0 +1,10 @@
+rain 999
+rain1 709
+rain2 601
+rain3 599
+rain4 409
+rain5 301
+rain6 299
+rain7 109
+rain8 51
+rain9 21
