@@ -9,8 +9,9 @@ import org.newdawn.slick.state.*;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class Play extends BasicGameState {
+public class Play extends BasicGameState implements GameConfig {
 
     /** OFFSET FOR MY CAR **/
     public static final float OFFSET_X = 400;
@@ -45,6 +46,8 @@ public class Play extends BasicGameState {
     private Boolean chatBoxHidden = true;
     private TextField chatBox;
     private TrueTypeFont chatFont;
+    protected static ConcurrentLinkedDeque<Message> chatMessages;
+
 
     public Play(int state) {
     }
@@ -92,10 +95,10 @@ public class Play extends BasicGameState {
             }
         }
 
-        /** INITIALIZE CHAT BOX **/
-        chatFont = Game.loadFont("res/zig.ttf", 22f);
+        /** INITIALIZE CHAT CLIENT **/
+        chatFont = Game.loadFont("res/zig.ttf", 20f);
         chatBox = initChatBox(gameContainer, chatFont);
-;
+        chatMessages = new ConcurrentLinkedDeque<>();
    }
 
     @Override
@@ -121,8 +124,8 @@ public class Play extends BasicGameState {
             graphics.draw(bounds.get(key));
         }
 
-        /** RENDERING CHAT BOX **/
-        renderChatBox(gameContainer, graphics);
+        /** RENDERING CHAT **/
+        renderChat(gameContainer, graphics);
     }
 
     @Override
@@ -147,8 +150,6 @@ public class Play extends BasicGameState {
                 powerUps.remove(i);
             }
         }
-
-
     }
 
     public void trackCursor(float targetX, float targetY){
@@ -250,11 +251,16 @@ public class Play extends BasicGameState {
         return field;
     }
 
-    private void renderChatBox(GameContainer gameContainer, Graphics graphics){ ;
+    private void renderChat(GameContainer gameContainer, Graphics graphics){
+        graphics.setFont(this.chatFont);
+
+        /** DISPLAY ALL MESSAGES FROM PLAYERS **/
+        renderMessages(graphics);
+
+        /** DISPLAY CHAT BOX **/
         if(!chatBoxHidden){
             //Set "(ALL):" label color
             graphics.setColor(Color.white);
-            graphics.setFont(this.chatFont);
             graphics.drawString("(ALL): ", 30, 550);
 
             chatBox.render(gameContainer, graphics);
@@ -262,12 +268,33 @@ public class Play extends BasicGameState {
         }
     }
 
+    private void renderMessages(Graphics graphics){
+        int y = 440; //Y-position of topmost message
+        for(Message message : chatMessages){
+            message.render(30, y, graphics);
+            y+=20;
+        }
+    }
+
     private void toggleChatListener(Input input){
         if(input.isKeyPressed(Input.KEY_ENTER)){
-            if(!chatBoxHidden){
-                chatBox.setText(""); //Clear chat box text
+            if(!chatBoxHidden && chatBox.getText().length() > 0){
+                MainMenu.chat.send(chatBox.getText());
             }
+            chatBox.setText(""); //Clear chat box text
             chatBoxHidden = !chatBoxHidden; //Toggle chat box visibility
         }
+    }
+
+    protected static void emitMessage(String message){
+
+        /** LAST FIVE MESSAGES **/
+        if(Play.chatMessages.size() == 5){
+            Play.chatMessages.removeFirst();
+        }
+
+        /** START TIMER AFTER ADDING MESSAGE TO QUEUE **/
+        Play.chatMessages.addLast(new Message(message));
+        Play.chatMessages.getLast().startTimer();
     }
 }

@@ -1,3 +1,4 @@
+package dodgeEm;
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -55,7 +56,7 @@ public class ChatThread extends Thread{
   }
 
   private void send(String msg, String messenger) throws IOException {
-    os.println(messenger + "> " + msg);
+    os.println(messenger + ":" + msg);
     // if (!(msg.equals("\n")) || !(msg.equals(""))) {
     //   os.println(messenger + "> " + msg);
     // }

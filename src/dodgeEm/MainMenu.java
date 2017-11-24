@@ -27,6 +27,9 @@ public class MainMenu extends BasicGameState {
     private TextField nameField;
     private TrueTypeFont nameFieldFont;
 
+    /** CHAT CLIENT **/
+    protected static ChatClient chat;
+
     public MainMenu(int state){ }
 
     @Override
@@ -44,7 +47,7 @@ public class MainMenu extends BasicGameState {
         this.carColor = 0;
         this.name = "";
         this.nameFieldFont = loadFont("res/zig.ttf", 35f);
-        nameField = initNameField(gameContainer, nameFieldFont);
+        this.nameField = initNameField(gameContainer, nameFieldFont);
 
     }
 
@@ -99,7 +102,13 @@ public class MainMenu extends BasicGameState {
         /** START GAME BUTTON **/
         if(this.xPos > 397 && this.xPos < 493 && this.yPos > 80 && this.yPos <100){
             if(Mouse.isButtonDown(0)){
-                this.name = this.nameField.getText();
+
+                /** INITIALIZE CHAT CLIENT **/
+                MainMenu.name = this.nameField.getText();
+                MainMenu.chat = new ChatClient();
+                MainMenu.chat.startChatSession(MainMenu.name);
+
+                /** START DODGE EM  **/
                 stateBasedGame.getState(Game.PLAY).init(gameContainer, stateBasedGame);
                 stateBasedGame.enterState(Game.PLAY);
             }

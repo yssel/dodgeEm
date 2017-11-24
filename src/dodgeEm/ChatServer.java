@@ -1,8 +1,10 @@
+package dodgeEm;
+
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 
-public class ChatServer implements Constants{
+public class ChatServer implements GameConfig {
   public String name;
   public static ArrayList<ChatThread> threadList = new ArrayList<>();
 

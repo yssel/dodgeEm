@@ -1,26 +1,22 @@
+package dodgeEm;
+
 import java.io.*;
 import java.net.*;
 
-public class ChatClient implements Constants, Runnable {
+public class ChatClient implements GameConfig, Runnable {
   private static Socket clientSocket = null;
   private static PrintStream os = null;
   private static DataInputStream is = null;
-
-  private static BufferedReader reader = null;
   private static boolean closed = false;
-  public static String name = null;
 
-  public static void main(String[] args) {
-    int portNumber = PORT;
-    String host = args[0];
-    name = args[1];
+  public ChatClient(){}
 
+  public void startChatSession(String playerName){
     try {
-      clientSocket = new Socket(host, portNumber);
-      reader = new BufferedReader(new InputStreamReader(System.in));
+      clientSocket = new Socket(HOST, PORT);
       os = new PrintStream(clientSocket.getOutputStream());
       is = new DataInputStream(clientSocket.getInputStream());
-      sendName(); //send name to server
+      sendName(playerName); //send name to server
     } catch (UnknownHostException e){
       e.printStackTrace();
     } catch (IOException e){
@@ -28,35 +24,37 @@ public class ChatClient implements Constants, Runnable {
     }
 
     try {
-      new Thread(new ChatClient()).start();
-      while(!closed) {
-        os.println(reader.readLine().trim());   //printing
+      new Thread(this).start();
+      if(closed){
+          os.close();
+          is.close();
+          clientSocket.close();
       }
-      os.close();
-      is.close();
-      clientSocket.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
-  }  
+  }
 
-  public static void sendName() {
+  public void send(String message){
+    os.println(message);
+  }
+
+  public static void sendName(String name) {
     try {
-      String name1 = name;
-      os.print(name1);
+      os.print(name);
     } catch (Exception e){
       e.printStackTrace();
     }
   }
 
  public void run() {
-    String responseLine;
+    String response;
     try {
-      while((responseLine = is.readLine()) != null) {
-        System.out.println(responseLine);
-        if (responseLine.indexOf("quit") != -1) {
-          break;
-        }
+      while((response = is.readLine()) != null) {
+          Play.emitMessage(response);
+          if (response.indexOf("quit") != -1) {
+              break;
+          }
       }
       closed = true;
     }
