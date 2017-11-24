@@ -65,9 +65,9 @@ public class Car {
         /** VISUALIZATION AND SIZING **/
 
         this.font = loadFont("res/zig.ttf", 25f);
-//        this.sprite = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0)
-//                .getSprite(this.color, 0)
-//                .getScaledCopy(0.13f);
+        this.sprite = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0)
+                .getSprite(this.color, 0)
+                .getScaledCopy(0.13f);
 
         this.width = this.sprite.getWidth();
         this.height = this.sprite.getHeight();

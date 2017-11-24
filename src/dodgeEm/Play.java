@@ -62,11 +62,11 @@ public class Play extends BasicGameState {
 
         /** INITIALIZE OTHER BUMPER CARS **/
         car = new Car("Yssel", 1, 0);
-//        car.init(650, 500);
+        car.init(650, 500);
 
         /** INITIALIZE MY CAR **/
         myCar = new Car(MainMenu.name, MainMenu.carColor, 180);
-//        myCar.init(1000, 1000);
+        myCar.init(1000, 1000);
 
         /** INITIALIZE MAP ARENA BOUNDS **/
         initArenaBounds();
@@ -107,8 +107,8 @@ public class Play extends BasicGameState {
         }
 
         /**RENDERING OF BUMPER CARS */
-//        car.render();
-//        myCar.renderFixed();
+        car.render();
+        myCar.renderFixed();
 
         /** CURRENT LOCATION OF MY CAR **/
         graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
@@ -119,6 +119,7 @@ public class Play extends BasicGameState {
             graphics.draw(bounds.get(key));
         }
 
+        /** RENDERING OF SCORE BOARD **/
         scoreBoard.render();
     }
 
@@ -133,15 +134,14 @@ public class Play extends BasicGameState {
         playArrow(gameContainer);
 
         /** PLAY USING MOUSE **/
-//        playCursor(delta);
+        playCursor(delta);
 
-//        for(Integer i: powerUps.keySet()){
-//            if(myCar.bounds.intersects(powerUps.get(i).bounds)){
-//                myCar.usePowerUp(powerUps.get(i));
-//                powerUps.remove(i);
-//            }
-//        }
-        //scoreboard upate
+        for(Integer i: powerUps.keySet()){
+            if(myCar.bounds.intersects(powerUps.get(i).bounds)){
+                myCar.usePowerUp(powerUps.get(i));
+                powerUps.remove(i);
+            }
+        }
     }
 
     public void trackCursor(float targetX, float targetY){

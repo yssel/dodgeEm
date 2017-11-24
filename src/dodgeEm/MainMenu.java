@@ -36,7 +36,7 @@ public class MainMenu extends BasicGameState {
 
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
-//        this.spriteSheet = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0);
+        this.spriteSheet = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0);
         this.map = new Image("res/map.png").getScaledCopy(0.6f);
         this.arrow = new Image("res/arrow.png").getScaledCopy(0.15f);
 
@@ -61,8 +61,8 @@ public class MainMenu extends BasicGameState {
         arrow.drawCentered(Game.CENTER_X + 180, Game.CENTER_Y);
 
         /** BUMPER CAR **/
-//        car = spriteSheet.getSprite(this.carColor, 0).getScaledCopy(new Float(0.13f));
-//        car.drawCentered(Game.CENTER_X, Game.CENTER_Y);
+        car = spriteSheet.getSprite(this.carColor, 0).getScaledCopy(new Float(0.13f));
+        car.drawCentered(Game.CENTER_X, Game.CENTER_Y);
 
         graphics.drawString("x: " + this.xPos + " y: " + this.yPos, Game.CENTER_X, 20);
         graphics.drawString("Start game", Game.CENTER_X, 500);
@@ -109,7 +109,6 @@ public class MainMenu extends BasicGameState {
         this.xPos = Mouse.getX();
         this.yPos = Mouse.getY();
     }
-
 
 
     public TextField initNameField(GameContainer gameContainer, TrueTypeFont font){
