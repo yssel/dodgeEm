@@ -41,7 +41,7 @@ public class ChatClient implements GameConfig, Runnable {
 
   public static void sendName(String name) {
     try {
-      os.print(name);
+      os.println(name);
     } catch (Exception e){
       e.printStackTrace();
     }
