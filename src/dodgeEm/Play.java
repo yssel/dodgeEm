@@ -4,6 +4,7 @@ import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
+import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.state.*;
 import java.util.HashMap;
 import java.util.Random;
@@ -40,6 +41,11 @@ public class Play extends BasicGameState {
     private ConcurrentHashMap<Integer, PowerUp> powerUps;
     private HashMap<String, Shape> bounds;
 
+    /** CHAT BOX COMPONENTS **/
+    private Boolean chatBoxHidden = true;
+    private TextField chatBox;
+    private TrueTypeFont chatFont;
+
     public Play(int state) {
     }
 
@@ -72,16 +78,24 @@ public class Play extends BasicGameState {
             Random rand = new Random();
             switch(rand.nextInt(3)){
                 case 0:
-                    powerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                    powerUps.put(i, new Health( ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT),
+                                                ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
                     break;
                 case 1:
-                    powerUps.put(i, new Gum(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                    powerUps.put(i, new Gum(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT),
+                                            ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
                     break;
                 case 2:
-                    powerUps.put(i, new Boost(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                    powerUps.put(i, new Boost(  ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT),
+                                                ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
                     break;
             }
         }
+
+        /** INITIALIZE CHAT BOX **/
+        chatFont = Game.loadFont("res/zig.ttf", 22f);
+        chatBox = initChatBox(gameContainer, chatFont);
+;
    }
 
     @Override
@@ -106,6 +120,9 @@ public class Play extends BasicGameState {
             graphics.setColor(Color.green);
             graphics.draw(bounds.get(key));
         }
+
+        /** RENDERING CHAT BOX **/
+        renderChatBox(gameContainer, graphics);
     }
 
     @Override
@@ -121,12 +138,16 @@ public class Play extends BasicGameState {
         /** PLAY USING MOUSE **/
         playCursor(delta);
 
+        /** TOGGLE CHAT BOX **/
+        toggleChatListener(gameContainer.getInput());
+
         for(Integer i: powerUps.keySet()){
             if(myCar.bounds.intersects(powerUps.get(i).bounds)){
                 myCar.usePowerUp(powerUps.get(i));
                 powerUps.remove(i);
             }
         }
+
 
     }
 
@@ -215,5 +236,38 @@ public class Play extends BasicGameState {
         bounds.replace("TOP", new Rectangle(mapX+ARENA_LEFT, mapY+(ARENA_TOP-60), ARENA_RIGHT-ARENA_LEFT, 60));
         bounds.replace("RIGHT", new Rectangle(mapX+ARENA_RIGHT, mapY+ARENA_TOP, 60, ARENA_BOTTOM-ARENA_TOP));
         bounds.replace("BOTTOM", new Rectangle(mapX+ARENA_LEFT, mapY+ARENA_BOTTOM, ARENA_RIGHT-ARENA_LEFT, 60));
+    }
+
+    /** CHATBOX-RELATED METHODS **/
+    private TextField initChatBox(GameContainer gameContainer, TrueTypeFont font){
+        TextField field = new TextField(gameContainer, font,
+                font.getWidth("(ALL): ")+30, 550,
+                (font.getWidth("123")*10)+10, 25);
+        field.setBackgroundColor(Color.black);
+        field.setBorderColor(Color.transparent);
+        field.setTextColor(Color.white);
+        field.setMaxLength(30);
+        return field;
+    }
+
+    private void renderChatBox(GameContainer gameContainer, Graphics graphics){ ;
+        if(!chatBoxHidden){
+            //Set "(ALL):" label color
+            graphics.setColor(Color.white);
+            graphics.setFont(this.chatFont);
+            graphics.drawString("(ALL): ", 30, 550);
+
+            chatBox.render(gameContainer, graphics);
+            chatBox.setFocus(true);
+        }
+    }
+
+    private void toggleChatListener(Input input){
+        if(input.isKeyPressed(Input.KEY_ENTER)){
+            if(!chatBoxHidden){
+                chatBox.setText(""); //Clear chat box text
+            }
+            chatBoxHidden = !chatBoxHidden; //Toggle chat box visibility
+        }
     }
 }
