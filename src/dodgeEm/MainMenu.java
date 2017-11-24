@@ -22,6 +22,7 @@ public class MainMenu extends BasicGameState {
     /** PLAYER INFO **/
     public static int carColor;
     public static String name;
+    public static int kills = 0;
 
     /** NAME FIELD AND CUSTOM FONT **/
     private TextField nameField;

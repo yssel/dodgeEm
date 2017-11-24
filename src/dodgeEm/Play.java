@@ -5,8 +5,6 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.*;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +86,7 @@ public class Play extends BasicGameState {
         }
         try {
             scoreBoard = new ScoreBoard();
-            scoreBoard.writeScorers();
+//            scoreBoard.writeScorers();
             scoreBoard.readScorersArray();
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,6 +140,8 @@ public class Play extends BasicGameState {
                 powerUps.remove(i);
             }
         }
+
+        scoreBoard.listen(gameContainer.getInput());
     }
 
     public void trackCursor(float targetX, float targetY){

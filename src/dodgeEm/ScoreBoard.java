@@ -1,9 +1,8 @@
 package dodgeEm;
 
+import org.newdawn.slick.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.TrueTypeFont;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,21 +29,22 @@ public class ScoreBoard {
     private MessageDigest sha;
     private SecretKeySpec secretKeySpec;
     private static Cipher cipher;
+    private Boolean visible = false;
 
     public ScoreBoard() throws Exception {
         this.font = loadFont("res/zig.ttf", 25f);
         this.font1 = loadFont("res/zig.ttf", 20f);
-        /** Temporary top scorers **/
-        scorers.add("rain 999");
-        scorers.add("rain1 709");
-        scorers.add("rain2 601");
-        scorers.add("rain3 599");
-        scorers.add("rain4 409");
-        scorers.add("rain5 301");
-        scorers.add("rain6 299");
-        scorers.add("rain7 109");
-        scorers.add("rain8 51");
-        scorers.add("rain9 21");
+//        /** Temporary top scorers **/
+//        scorers.add("rain 999");
+//        scorers.add("rain1 709");
+//        scorers.add("rain2 601");
+//        scorers.add("rain3 599");
+//        scorers.add("rain4 409");
+//        scorers.add("rain5 301");
+//        scorers.add("rain6 299");
+//        scorers.add("rain7 109");
+//        scorers.add("rain8 51");
+//        scorers.add("rain9 21");
         try{
             key = (SALT2+game).getBytes("UTF-8");
             sha = MessageDigest.getInstance("SHA-1");
@@ -63,62 +63,58 @@ public class ScoreBoard {
 
     public void render(){
         Graphics graphics = new Graphics();
-        String [] str;
+        String [] tokens = new String[2];
         graphics.setFont(this.font);
 
-        graphics.setColor(new Color(192f,192f,192f,100f));
-        graphics.drawRect(200,30,400,500);
+        if(this.visible) {
+            graphics.setColor(new Color(0,0,0, 120));
+            graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
-        String string = "SCOREBOARD";
-        graphics.drawString(string, Game.CENTER_X-(this.font.getWidth(string)/2), Game.CENTER_Y-250);
-        float centerX= Game.CENTER_X-(this.font.getWidth(string)/2);
+            graphics.setColor(new Color(192f, 192f, 192f, 100f));
+            graphics.drawRect(Game.CENTER_X - 200, Game.CENTER_Y - 270, 400, 540);
 
-        graphics.setFont(this.font1);
-        String string1 = "PLAYER";
-        String string2 = "KILLS";
+            String title = "SCOREBOARD";
+            graphics.drawString(title, Game.CENTER_X - (this.font.getWidth(title) / 2), (Game.CENTER_Y - 270) + 20);
+            float centerX = Game.CENTER_X - (this.font.getWidth(title)  / 2);
 
-        graphics.drawString(string1, centerX+((this.font.getWidth(string1)/2)-90), Game.CENTER_Y-(250-40));
-        graphics.drawString(string2, centerX+((this.font.getWidth(string2)/2)+90), Game.CENTER_Y-(250-40));
-        float lcenterX= centerX+((this.font.getWidth(string1)/2)-90);
-        float rcenterX= centerX+((this.font.getWidth(string2)/2)+90);
-        str = scorers.get(0).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-120));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-120));
-        str = scorers.get(1).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-160));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-160));
-        str = scorers.get(2).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-200));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-200));
-        str = scorers.get(3).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-240));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-240));
-        str = scorers.get(4).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-280));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-280));
-        str = scorers.get(5).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-320));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-320));
-        str = scorers.get(6).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-360));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-360));
-        str = scorers.get(7).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-400));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-400));
-        str = scorers.get(8).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-440));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-440));
-        str = scorers.get(9).split(" ");
-        graphics.drawString(str[0], lcenterX+((this.font.getWidth(str[0])/2)/2), Game.CENTER_Y-(290-480));
-        graphics.drawString(str[1], rcenterX+((this.font.getWidth(str[1])/2)/2), Game.CENTER_Y-(290-480));
+            graphics.setFont(this.font1);
+            String player = "PLAYER";
+            String score = "KILLS";
+
+            float playerCenterX = centerX - ((this.font.getWidth(player) / 2));
+            float scoreCenterX = centerX + (this.font.getWidth(title)/2) + (this.font.getWidth(score)/2);
 
 
+            graphics.drawString(player, playerCenterX, (Game.CENTER_Y - 270) + 60);
+            graphics.drawString(score, scoreCenterX, (Game.CENTER_Y - 270) + 60);
 
+            float lineEnd = 0;
 
-        //centering
-        // graphics.drawString(string, Game.CENTER_X-(this.font.getWidth(string)/2), Game.CENTER_Y-(this.font.getHeight(string)/2));
-        //graphics.drawRect(10, 10, 10, 10);
+            for(int i = 0; i < scorers.size(); i++) {
+                tokens = scorers.get(i).split(" ");
 
+                int lineSpacing = 40*i;
+                lineEnd = scoreCenterX + this.font.getWidth(score)-15 - (this.font.getWidth(tokens[1]));
+
+                graphics.setColor(Color.white);
+                graphics.drawString(tokens[0], playerCenterX, (Game.CENTER_Y - 170) + lineSpacing);
+                graphics.drawString(tokens[1], lineEnd, (Game.CENTER_Y - 170)  + lineSpacing);
+            }
+
+            lineEnd = scoreCenterX + this.font.getWidth(score)-15 - (this.font.getWidth(Integer.toString(MainMenu.kills)));
+
+            graphics.setColor(Color.red);
+            graphics.drawString(MainMenu.name, playerCenterX, (Game.CENTER_Y - 170) + 40*10);
+            graphics.drawString(Integer.toString(MainMenu.kills), lineEnd, (Game.CENTER_Y - 170) + 40*10);
+        }
+    }
+
+    public void listen(Input input){
+        if(input.isKeyDown(Input.KEY_TAB)){
+            this.visible = true;
+        } else{
+            this.visible = false;
+        }
     }
 
     public void writeScorers() throws Exception {
@@ -133,7 +129,7 @@ public class ScoreBoard {
         fw.close();
     }
 
-    public ArrayList<String> readScorersArray() throws Exception{
+    public void readScorersArray() throws Exception{
         ArrayList<String> scorers = new ArrayList<>();
         String plainText="";
         try{
@@ -150,9 +146,8 @@ public class ScoreBoard {
         String [] topscorers = decryptedText.split("\n");
 
         for(String str : topscorers){
-            scorers.add(str);
+            this.scorers.add(str);
         }
-        return scorers;
     }
 
     public String encrypt(String plainText, SecretKey secretKey) throws Exception {
