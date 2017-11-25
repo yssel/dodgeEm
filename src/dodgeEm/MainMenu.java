@@ -17,6 +17,12 @@ public class MainMenu extends BasicGameState {
     private Image map;
     private Image arrow;
     private SpriteSheet spriteSheet;
+    private SpriteSheet buttons;
+
+    /** MAIN MENU BUTTONS **/
+    private Image startBtn;
+    private Image settingsBtn;
+    private Image helpBtn;
 
 
     /** PLAYER INFO **/
@@ -37,6 +43,13 @@ public class MainMenu extends BasicGameState {
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         this.spriteSheet = new SpriteSheet("res/bumper-car1.png", 2129, 1250, 0);
+        this.buttons = new SpriteSheet("res/menu-buttons.png", 266, 69, 0);
+
+        /** MAIN MENU BUTTONS **/
+        this.startBtn = this.buttons.getSprite(0,0);
+        this.settingsBtn = this.buttons.getSubImage(0, this.startBtn.getHeight(), 66, 71);
+        this.helpBtn = this.buttons.getSubImage(this.settingsBtn.getWidth()*2, this.startBtn.getHeight(), 66, 71);
+
         this.map = new Image("res/map.png").getScaledCopy(0.6f);
         this.arrow = new Image("res/arrow.png").getScaledCopy(0.15f);
 
@@ -45,6 +58,8 @@ public class MainMenu extends BasicGameState {
         this.name = "";
         this.nameFieldFont = loadFont("res/zig.ttf", 35f);
         nameField = initNameField(gameContainer, nameFieldFont);
+
+
 
     }
 
@@ -71,7 +86,12 @@ public class MainMenu extends BasicGameState {
         nameField.render(gameContainer, graphics);
         nameField.setFocus(true);
         nameField.setLocation(Math.round(Game.CENTER_X - (this.nameFieldFont.getWidth(this.nameField.getText())/2)),
-                Math.round(Game.CENTER_Y+100));
+                Math.round(Game.CENTER_Y + 112));
+
+        /** MAIN MENU BUTTONS **/
+        startBtn.drawCentered(Game.CENTER_X, Game.CENTER_Y + 215);
+        settingsBtn.drawCentered(50, Game.SCREEN_HEIGHT-50);
+        helpBtn.drawCentered(50, Game.SCREEN_HEIGHT-130);
     }
 
     @Override
@@ -96,21 +116,13 @@ public class MainMenu extends BasicGameState {
             }
         }
 
-        /** START GAME BUTTON **/
-        if(this.xPos > 397 && this.xPos < 493 && this.yPos > 80 && this.yPos <100){
-            if(Mouse.isButtonDown(0)){
-                this.name = this.nameField.getText();
-                stateBasedGame.getState(Game.PLAY).init(gameContainer, stateBasedGame);
-                stateBasedGame.enterState(Game.PLAY);
-            }
-        }
+        /** MAIN MENU BUTTON HOVER & CLICK LISTENER **/
+        buttonListeners(stateBasedGame, gameContainer, gameContainer.getInput());
 
         /** GET CURSOR LOCATION **/
         this.xPos = Mouse.getX();
-        this.yPos = Mouse.getY();
+        this.yPos = Game.SCREEN_HEIGHT - Mouse.getY();
     }
-
-
 
     public TextField initNameField(GameContainer gameContainer, TrueTypeFont font){
         TextField field = new TextField(gameContainer, font,
@@ -122,6 +134,46 @@ public class MainMenu extends BasicGameState {
         field.setTextColor(Color.white);
         field.setMaxLength(5);
         return field;
+    }
+
+
+    public void buttonListeners(StateBasedGame stateBasedGame, GameContainer gameContainer, Input input) throws SlickException{
+        /** START GAME BUTTON **/
+        float startBtnWidth = startBtn.getWidth()/2;
+        float startBtnHeight = startBtn.getHeight()/2;
+        startBtn = buttons.getSprite(0,0); //reset texture to normal
+
+        if(this.xPos > Game.CENTER_X - startBtnWidth && this.xPos < Game.CENTER_X + startBtnWidth &&
+                this.yPos > (Game.CENTER_Y + 215 - startBtnHeight) && this.yPos < (Game.CENTER_Y + 215 + startBtnHeight)){
+
+            startBtn = this.buttons.getSprite(1,0); //set texture to hover
+
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                this.name = this.nameField.getText();
+                stateBasedGame.getState(Game.PLAY).init(gameContainer, stateBasedGame);
+                stateBasedGame.enterState(Game.PLAY);
+            }
+        }
+
+        /** ROUND BUTTONS **/
+        float roundBtnWidth = settingsBtn.getWidth()/2;
+        float roundBtnHeight = settingsBtn.getHeight()/2;
+
+        settingsBtn = this.buttons.getSubImage(0, this.startBtn.getHeight(), 66, 71); //reset texture to normal
+        helpBtn = this.buttons.getSubImage(this.settingsBtn.getWidth()*2, this.startBtn.getHeight(), 66, 71); //reset texture to normal
+
+
+        /* SETTINGS BUTTON */
+        if(this.xPos > 50 - roundBtnWidth && this.xPos < 50 + roundBtnWidth &&
+                this.yPos > Game.SCREEN_HEIGHT - 50 - roundBtnHeight && this.yPos < Game.SCREEN_HEIGHT - 50 + roundBtnHeight){
+            settingsBtn = this.buttons.getSubImage(settingsBtn.getWidth(), this.startBtn.getHeight(), 66, 71); //set texture to hover
+        }
+
+        /* HELP BUTTON */
+        if(this.xPos > 50 - roundBtnWidth && this.xPos < 50 + roundBtnWidth &&
+                this.yPos > Game.SCREEN_HEIGHT - 130 - roundBtnHeight && this.yPos < Game.SCREEN_HEIGHT - 130 + roundBtnHeight){
+            helpBtn = this.buttons.getSubImage(this.settingsBtn.getWidth()*3, this.startBtn.getHeight(), 66, 71); //set texture to hover
+        }
     }
 
 
