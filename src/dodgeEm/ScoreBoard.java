@@ -20,6 +20,7 @@ import static dodgeEm.Game.loadFont;
 public class ScoreBoard {
     public TrueTypeFont font;
     public TrueTypeFont font1;
+    public TrueTypeFont font2;
     ArrayList<String> scorers = new ArrayList<>();
 
     /** FOR ENCRYPTION/DECRYPTION USING AES**/
@@ -32,8 +33,9 @@ public class ScoreBoard {
     private Boolean visible = false;
 
     public ScoreBoard() throws Exception {
-        this.font = loadFont("res/zig.ttf", 25f);
-        this.font1 = loadFont("res/zig.ttf", 20f);
+        this.font = loadFont("res/DJB.ttf", 40f);
+        this.font1 = loadFont("res/trench100free.ttf", 30f);
+        this.font2 = loadFont("res/trench100free.ttf", 45f);
 //        /** Temporary top scorers **/
 //        scorers.add("rain 999");
 //        scorers.add("rain1 709");
@@ -67,14 +69,12 @@ public class ScoreBoard {
         graphics.setFont(this.font);
 
         if(this.visible) {
-            graphics.setColor(new Color(0,0,0, 120));
+            graphics.setColor(new Color(255,255,255, 150));
             graphics.fillRect(0, 0, Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
 
-            graphics.setColor(new Color(192f, 192f, 192f, 100f));
-            graphics.drawRect(Game.CENTER_X - 200, Game.CENTER_Y - 270, 400, 540);
-
             String title = "SCOREBOARD";
-            graphics.drawString(title, Game.CENTER_X - (this.font.getWidth(title) / 2), (Game.CENTER_Y - 270) + 20);
+            graphics.setColor(Color.black);
+            graphics.drawString(title, Game.CENTER_X - (this.font.getWidth(title) / 2), (Game.CENTER_Y - 275));
             float centerX = Game.CENTER_X - (this.font.getWidth(title)  / 2);
 
             graphics.setFont(this.font1);
@@ -85,27 +85,39 @@ public class ScoreBoard {
             float scoreCenterX = centerX + (this.font.getWidth(title)/2) + (this.font.getWidth(score)/2);
 
 
-            graphics.drawString(player, playerCenterX, (Game.CENTER_Y - 270) + 60);
-            graphics.drawString(score, scoreCenterX, (Game.CENTER_Y - 270) + 60);
+            graphics.drawString(player, playerCenterX, (Game.CENTER_Y - 270) + 40);
+            graphics.drawString(score, scoreCenterX, (Game.CENTER_Y - 270) + 40);
 
             float lineEnd = 0;
 
             for(int i = 0; i < scorers.size(); i++) {
+
                 tokens = scorers.get(i).split(" ");
 
-                int lineSpacing = 40*i;
+                int lineSpacing = 45*i;
                 lineEnd = scoreCenterX + this.font.getWidth(score)-15 - (this.font.getWidth(tokens[1]));
+                if(i==0){
+                    graphics.setFont(this.font2);
+                    graphics.setColor(new Color(139,0,0, 180));
+                    graphics.fillRect(0, (Game.CENTER_Y - 190) + lineSpacing, Game.SCREEN_WIDTH, ((Game.CENTER_Y - 200) + lineSpacing+30)/4);
+                    //graphics.setColor(Color.white);
+                }
+                else{
+                    graphics.setFont(this.font1);
+                    graphics.setColor(new Color(0,0,0, 180-(i*5)));
+                    graphics.fillRect(0, (Game.CENTER_Y - 200) + lineSpacing, Game.SCREEN_WIDTH, ((Game.CENTER_Y - 200) + lineSpacing)/(4+i));
+                }
 
                 graphics.setColor(Color.white);
-                graphics.drawString(tokens[0], playerCenterX, (Game.CENTER_Y - 170) + lineSpacing);
-                graphics.drawString(tokens[1], lineEnd, (Game.CENTER_Y - 170)  + lineSpacing);
+                graphics.drawString(tokens[0], playerCenterX, (Game.CENTER_Y - 200) + lineSpacing);
+                graphics.drawString(tokens[1], lineEnd, (Game.CENTER_Y - 200)  + lineSpacing);
             }
 
             lineEnd = scoreCenterX + this.font.getWidth(score)-15 - (this.font.getWidth(Integer.toString(MainMenu.kills)));
 
             graphics.setColor(Color.red);
-            graphics.drawString(MainMenu.name, playerCenterX, (Game.CENTER_Y - 170) + 40*10);
-            graphics.drawString(Integer.toString(MainMenu.kills), lineEnd, (Game.CENTER_Y - 170) + 40*10);
+            graphics.drawString(MainMenu.name, playerCenterX, (Game.CENTER_Y - 200) + 45*10);
+            graphics.drawString(Integer.toString(MainMenu.kills), lineEnd, (Game.CENTER_Y - 200) + 45*10);
         }
     }
 
