@@ -105,7 +105,7 @@ public class ScoreBoard {
                 else{
                     graphics.setFont(this.font1);
                     graphics.setColor(new Color(0,0,0, 180-(i*5)));
-                    graphics.fillRect(0, (Game.CENTER_Y - 200) + lineSpacing, Game.SCREEN_WIDTH, ((Game.CENTER_Y - 200) + lineSpacing)/(4+i));
+                    graphics.fillRect(0, (Game.CENTER_Y - 200) + lineSpacing, Game.SCREEN_WIDTH, ((Game.CENTER_Y - 200) + lineSpacing)/(4+i-(2-i)));
                 }
 
                 graphics.setColor(Color.white);
