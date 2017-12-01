@@ -37,7 +37,9 @@ public class Play extends BasicGameState {
     private Car myCar = null;
 
     /** COLLECTIONS OF GAME OBJECTS **/
-    private ConcurrentHashMap<Integer, PowerUp> powerUps;
+    private ConcurrentHashMap<Integer, PowerUp> healthPowerUps;
+    private ConcurrentHashMap<Integer, PowerUp> boostPowerUps;
+    private ConcurrentHashMap<Integer, PowerUp> gumPowerUps;
     private HashMap<String, Shape> bounds;
 
     public Play(int state) {
@@ -54,7 +56,9 @@ public class Play extends BasicGameState {
         map = new Image("res/map.png").getScaledCopy(0.6f);
 
         /** INITIALIZE POWER UP **/
-        powerUps = new ConcurrentHashMap<>();
+        healthPowerUps = new ConcurrentHashMap<>();
+        boostPowerUps = new ConcurrentHashMap<>();
+        gumPowerUps = new ConcurrentHashMap<>();
 
         /** INITIALIZE OTHER BUMPER CARS **/
         car = new Car("Yssel", 1, 0);
@@ -68,19 +72,20 @@ public class Play extends BasicGameState {
         initArenaBounds();
 
         /** RANDOMIZE POWER UPS **/
-        for(int i=0; i<30; i++){
+       for(int i=0; i<6; i++){
+           Random rand = new Random();
+           healthPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+           healthPowerUps.get(i).spawn(1);
+       }
+        for(int i=0; i<12; i++){
             Random rand = new Random();
-            switch(rand.nextInt(3)){
-                case 0:
-                    powerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
-                    break;
-                case 1:
-                    powerUps.put(i, new Gum(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
-                    break;
-                case 2:
-                    powerUps.put(i, new Boost(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
-                    break;
-            }
+            gumPowerUps.put(i, new Gum(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+            gumPowerUps.get(i).spawn(2);
+       }
+        for(int i=0; i<12; i++){
+            Random rand = new Random();
+            boostPowerUps.put(i, new Boost(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+            boostPowerUps.get(i).spawn(3);
         }
    }
 
@@ -90,8 +95,14 @@ public class Play extends BasicGameState {
         map.draw(mapX, mapY);
 
         /** RENDERING OF POWER UPS **/
-        for(Integer i: powerUps.keySet()){
-            powerUps.get(i).render();
+        for(Integer i: healthPowerUps.keySet()){
+            healthPowerUps.get(i).render(1);
+        }
+        for(Integer i: gumPowerUps.keySet()){
+            gumPowerUps.get(i).render(2);
+        }
+        for(Integer i: boostPowerUps.keySet()){
+            boostPowerUps.get(i).render(3);
         }
 
         /**RENDERING OF BUMPER CARS */
@@ -121,14 +132,53 @@ public class Play extends BasicGameState {
         /** PLAY USING MOUSE **/
         playCursor(delta);
 
-        for(Integer i: powerUps.keySet()){
-            if(myCar.bounds.intersects(powerUps.get(i).bounds)){
-                myCar.usePowerUp(powerUps.get(i));
-                powerUps.remove(i);
+        for(Integer i: healthPowerUps.keySet()){
+            if(myCar.bounds.intersects(healthPowerUps.get(i).bounds)){
+                myCar.usePowerUp(healthPowerUps.get(i));
+                healthPowerUps.remove(i);
+                Random rand= new Random();
+                healthPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                healthPowerUps.get(i).spawn(1); //DOUBLE CHECK
+            }
+            else if(healthPowerUps.get(i).toRemove==true){
+                healthPowerUps.remove(i);
+                Random rand= new Random();
+                healthPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                healthPowerUps.get(i).spawn(1);
             }
         }
-
+        for(Integer i: gumPowerUps.keySet()) {
+            if (myCar.bounds.intersects(gumPowerUps.get(i).bounds)) {
+                myCar.usePowerUp(gumPowerUps.get(i));
+                gumPowerUps.remove(i);
+                Random rand= new Random();
+                gumPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                gumPowerUps.get(i).spawn(2); //DOUBLE CHECK
+            }
+            else if(gumPowerUps.get(i).toRemove==true){
+                gumPowerUps.remove(i);
+                Random rand= new Random();
+                gumPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                gumPowerUps.get(i).spawn(2);
+            }
+        }
+        for(Integer i: boostPowerUps.keySet()) {
+            if (myCar.bounds.intersects(boostPowerUps.get(i).bounds)) {
+                myCar.usePowerUp(boostPowerUps.get(i));
+                boostPowerUps.remove(i);
+                Random rand= new Random();
+                boostPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                boostPowerUps.get(i).spawn(3); //DOUBLE CHECK
+            }
+            else if(boostPowerUps.get(i).toRemove==true){
+                boostPowerUps.remove(i);
+                Random rand= new Random();
+                boostPowerUps.put(i, new Health(ARENA_LEFT + rand.nextFloat() * (ARENA_RIGHT - ARENA_LEFT), ARENA_TOP + rand.nextFloat() * (ARENA_BOTTOM - ARENA_TOP)));
+                boostPowerUps.get(i).spawn(3); //DOUBLE CHECK
+            }
+        }
     }
+
 
     public void trackCursor(float targetX, float targetY){
         float opposite = targetY - Game.CENTER_Y;
