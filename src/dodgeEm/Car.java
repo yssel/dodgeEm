@@ -170,12 +170,14 @@ public class Car {
                 Gum gum = (Gum) this.item;
                 gum.timer.cancel();
                 Car.this.speed = Car.this.maxSpeed; //returns normal speed
+                this.item=null;
                 System.out.println("CANCELLEDT GUM");
             }
             else if(this.item instanceof Boost){
                 Boost boost = (Boost) this.item;
                 boost.timer.cancel();
                 Car.this.speed = Car.this.maxSpeed; //returns normal speed
+                this.item=null;
                 System.out.println("CANCELLEDT BOOST");
             }
         }
