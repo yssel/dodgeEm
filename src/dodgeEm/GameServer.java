@@ -192,17 +192,17 @@ public class GameServer implements Runnable{
                         Player player = new Player(this.connectedPlayers, packet.getPort(), packet.getAddress(), carName, carColor, carAngle, initialX, initialY);
                         players.add(player);
 
-                        // Inform players a new player has connected
-                        // Format: 2,carName-carColor
-                        String message = carName + "-" + carColor;
-                        System.out.println(message);
-                        broadcastMessage(CONNECTED_PLAYER, message);
-
                         // Update playerCount
                         connectedPlayers++;
                         if(connectedPlayers == totalPlayers) {
                             serverState = GAME_START;
                         }
+
+                        // Inform players a new player has connected
+                        // Format: 2,connectedPlayers-totalPlayers
+                        String message = Integer.toString(connectedPlayers) + "-" + Integer.toString(totalPlayers);
+
+                        broadcastMessage(CONNECTED_PLAYER, message);
                     }
 
                     break;
