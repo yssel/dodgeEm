@@ -23,6 +23,7 @@ public class MainMenu extends BasicGameState {
     private Image startBtn;
     private Image settingsBtn;
     private Image helpBtn;
+    private Image logo;
 
 
     /** PLAYER INFO **/
@@ -36,6 +37,7 @@ public class MainMenu extends BasicGameState {
     /** CHAT CLIENT **/
     protected static ChatClient chat;
     private ConfigDialog configDialog;
+    private InstructionDialog instructionDialog;
 
     public MainMenu(int state){ }
 
@@ -56,6 +58,7 @@ public class MainMenu extends BasicGameState {
 
         this.map = new Image("res/map.png").getScaledCopy(0.6f);
         this.arrow = new Image("res/arrow.png").getScaledCopy(0.15f);
+        this.logo = new Image("res/logo.png");
 
         /** PLAYER NAME AND CAR COLOR **/
         this.carColor = 0;
@@ -65,6 +68,7 @@ public class MainMenu extends BasicGameState {
 
 
         configDialog = new ConfigDialog(gameContainer);
+        instructionDialog = new InstructionDialog(gameContainer);
         nameField.setFocus(true);
 
 
@@ -77,6 +81,8 @@ public class MainMenu extends BasicGameState {
         /** MAIN MENU BACKGROUND **/
         map.draw(0, 0);
 
+        logo.drawCentered(Game.CENTER_X, Game.CENTER_Y-190);
+
         /** CHANGE COLOR BUTTONS **/
         arrow.setRotation(0);
         arrow.drawCentered(Game.CENTER_X - 180, Game.CENTER_Y);
@@ -87,8 +93,8 @@ public class MainMenu extends BasicGameState {
         car = spriteSheet.getSprite(this.carColor, 0).getScaledCopy(new Float(0.13f));
         car.drawCentered(Game.CENTER_X, Game.CENTER_Y);
 
-        graphics.drawString("x: " + this.xPos + " y: " + this.yPos, Game.CENTER_X, 20);
-        graphics.drawString("Start game", Game.CENTER_X, 500);
+//        graphics.drawString("x: " + this.xPos + " y: " + this.yPos, Game.CENTER_X, 20);
+//        graphics.drawString("Start game", Game.CENTER_X, 500);
 
         /** DISPLAY NAME TEXT FIELD **/
         nameField.render(gameContainer, graphics);
@@ -101,6 +107,7 @@ public class MainMenu extends BasicGameState {
         helpBtn.drawCentered(50, Game.SCREEN_HEIGHT-130);
 
         configDialog.render(gameContainer, graphics);
+        instructionDialog.render(gameContainer, graphics);
     }
 
     @Override
@@ -191,12 +198,25 @@ public class MainMenu extends BasicGameState {
         if(this.xPos > 5 - roundBtnWidth && this.xPos < 50 + roundBtnWidth &&
                 this.yPos > Game.SCREEN_HEIGHT - 130 - roundBtnHeight && this.yPos < Game.SCREEN_HEIGHT - 130 + roundBtnHeight){
             helpBtn = this.buttons.getSubImage(this.settingsBtn.getWidth()*3, this.startBtn.getHeight(), 66, 71); //set texture to hover
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                instructionDialog.show();
+            }
         }
+
+
         if(this.xPos > 593 && this.xPos < 644 &&
                 this.yPos > 188 && this.yPos < 241 && configDialog.isVisible){
             settingsBtn = this.buttons.getSubImage(settingsBtn.getWidth(), this.startBtn.getHeight(), 66, 71); //set texture to hover
             if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
                 configDialog.hide();
+            }
+        }
+
+        if(this.xPos > 593 && this.xPos < 644 &&
+                this.yPos > 188 && this.yPos < 241 && instructionDialog.isVisible){
+            settingsBtn = this.buttons.getSubImage(settingsBtn.getWidth(), this.startBtn.getHeight(), 66, 71); //set texture to hover
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                instructionDialog.hide();
             }
         }
     }

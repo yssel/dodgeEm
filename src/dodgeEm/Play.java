@@ -143,7 +143,7 @@ public class Play extends BasicGameState implements GameConfig {
                         System.out.println("ENTERED HERE");
                         myCar.renderFixed();
                         /** CURRENT LOCATION OF MY CAR **/
-                        graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
+//                        graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
                         encountered=true;
                     }else{
                         System.out.println("RECEIVED: "+ playersInfo[i]);
@@ -169,7 +169,7 @@ public class Play extends BasicGameState implements GameConfig {
             renderChat(gameContainer, graphics);
 
 
-            graphics.drawString("carX: " + myCar.posX + "carY: " + myCar.posY, 200, 40);
+//            graphics.drawString("carX: " + myCar.posX + "carY: " + myCar.posY, 200, 40);
         }
     }
 
