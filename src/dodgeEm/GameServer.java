@@ -1,18 +1,17 @@
 package dodgeEm;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class GameServer implements Runnable, GameConfig{
     String playerData;
     int playerCount=0; //currently connected player
     DatagramSocket serverSocket = null;
 
+    private ArrayList<Point> initialPositions = new ArrayList<Point>();
     ArrayList<String> names = new ArrayList<>();
     GameState game;
     int gameStage=WAITING_FOR_PLAYERS;
@@ -110,6 +109,18 @@ public class GameServer implements Runnable, GameConfig{
                     break;
                 case GAME_START:
                     System.out.println("Game State: START");
+                    Map players = game.getPlayers();
+                    for(int i=0; i<names.size(); i++){
+                        // Randomize initial X and Y position available for client car
+                        Point initialPoint = getInitialXY();
+                        int initialX = (int)initialPoint.getX();
+                        int initialY = (int)initialPoint.getY();
+                        Player player=(Player)players.get(names.get(i));
+                        player.posX=initialX;
+                        player.posY=initialY;
+                        initialPositions.add(initialPoint);
+                        game.update(names.get(i),player);
+                    }
                     broadcast("START");
                     gameStage=IN_PROGRESS;
                     break;
@@ -134,7 +145,28 @@ public class GameServer implements Runnable, GameConfig{
             }
         }
     }
+    public Point getInitialXY(){
+        Random rand = new Random();
+        int x,y;
+        // Generate safe initial X and Y position for car
+        boolean coordDoesNotCollide;
+        while (true) {
+            x = rand.nextInt(3500) + 700;
+            y = rand.nextInt(2300) + 700;
+            coordDoesNotCollide = true;
+            for (Point point : initialPositions) {
+                if (x + 300 > point.getX() - 300 || x - 300 < point.getX() + 300 || y + 300 > point.getY() || y - 300 < point.getY()) {
+                    coordDoesNotCollide = false;
+                    break;
+                }
+            }
 
+            if(coordDoesNotCollide) break;
+        }
+
+        Point feasiblePoint = new Point(x,y);
+        return  feasiblePoint;
+    }
     public static void main(String args[]) {
         new GameServer();
     }

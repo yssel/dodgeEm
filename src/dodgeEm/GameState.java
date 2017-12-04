@@ -8,6 +8,7 @@ public class GameState {
     public GameState(){}
 
     public void update(String name, Player player){
+
         players.put(name,player);
     }
 

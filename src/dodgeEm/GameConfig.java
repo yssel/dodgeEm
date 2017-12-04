@@ -3,7 +3,7 @@ package dodgeEm;
 public interface GameConfig {
 	String APP_NAME = "Dodge 'Em 0.01";
     String HOST = "localhost";
-    int playerNum=3;
+    int playerNum=2;
 	int PORT = 3000;
 
 	final int GAME_START=0;

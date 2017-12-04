@@ -3,6 +3,7 @@ package dodgeEm;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
+import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.TextField;
@@ -12,6 +13,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,6 +61,7 @@ public class Play extends BasicGameState implements GameConfig {
     private String serverdata;
     private boolean connected=false;
     private boolean started=false;
+
 
     public Play(int state) throws SocketException {
         socket.setSoTimeout(100);
@@ -143,7 +146,7 @@ public class Play extends BasicGameState implements GameConfig {
                         graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
                         encountered=true;
                     }else{
-                        System.out.println("RECEIVED: "+ playerInfo[i]);
+                        System.out.println("RECEIVED: "+ playersInfo[i]);
                         if(!encountered){
                             cars.get(i).update( Float.parseFloat(playerInfo[2]),Float.parseFloat(playerInfo[3]),Float.parseFloat(playerInfo[4]), Float.parseFloat(playerInfo[5]),Float.parseFloat(playerInfo[6]),Float.parseFloat(playerInfo[7]),Float.parseFloat(playerInfo[8]),Float.parseFloat(playerInfo[9]), Float.parseFloat(playerInfo[10]), Float.parseFloat(playerInfo[11]), playerInfo[1], Integer.parseInt(playerInfo[12]));
                             cars.get(i).render();
@@ -197,7 +200,7 @@ public class Play extends BasicGameState implements GameConfig {
             playArrow(gameContainer);
 
             /** PLAY USING MOUSE **/
-           // playCursor(delta);
+            playCursor(delta);
 
             /** TOGGLE CHAT BOX **/
             toggleChatListener(gameContainer.getInput());
