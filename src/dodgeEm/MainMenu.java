@@ -4,6 +4,11 @@ import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
 import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.state.*;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 import static dodgeEm.Game.loadFont;
 
 public class MainMenu extends BasicGameState {
@@ -28,6 +33,9 @@ public class MainMenu extends BasicGameState {
     private TextField nameField;
     private TrueTypeFont nameFieldFont;
 
+
+    protected static DatagramSocket clientSocket;
+
     public MainMenu(int state){ }
 
     @Override
@@ -46,6 +54,13 @@ public class MainMenu extends BasicGameState {
         this.name = "";
         this.nameFieldFont = loadFont("res/zig.ttf", 35f);
         nameField = initNameField(gameContainer, nameFieldFont);
+
+        try {
+            clientSocket = new DatagramSocket();
+            clientSocket.setSoTimeout(1000);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -101,8 +116,12 @@ public class MainMenu extends BasicGameState {
         if(this.xPos > 397 && this.xPos < 493 && this.yPos > 80 && this.yPos <100){
             if(Mouse.isButtonDown(0)){
                 this.name = this.nameField.getText();
-                stateBasedGame.getState(Game.PLAY).init(gameContainer, stateBasedGame);
-                stateBasedGame.enterState(Game.PLAY);
+                stateBasedGame.getState(Game.LOBBY).init(gameContainer, stateBasedGame);
+
+                String clientData = MainMenu.name + "-" + Integer.toString(MainMenu.carColor);
+                sendClientData(GameServer.CONNECTING_PLAYER, clientData);
+
+                stateBasedGame.enterState(Game.LOBBY);
             }
         }
 
@@ -122,6 +141,19 @@ public class MainMenu extends BasicGameState {
         field.setTextColor(Color.white);
         field.setMaxLength(5);
         return field;
+    }
+
+
+    public void sendClientData(int state, String message){
+        try{
+            message = Integer.toString(state) + "," + message;
+            byte buf[] = message.getBytes();
+            InetAddress hostAddress = InetAddress.getByName(GameConfig.HOST);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, hostAddress, GameConfig.PORT);
+            clientSocket.send(packet);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

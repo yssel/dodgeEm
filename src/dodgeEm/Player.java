@@ -111,6 +111,6 @@ public class Player {
     }
 
     public boolean isAlive(){
-        return if(this.playerAlive == 1) true : false;
+        return this.playerAlive == 1;
     }
 }

@@ -12,6 +12,7 @@ public class Game extends StateBasedGame {
     public static final String GAME_NAME = "Dodge 'Em";
     public static final int MENU = 0;
     public static final int PLAY = 1;
+    public static final int LOBBY = 2;
 
     /** GAME WINDOW SIZE **/
     public static final int SCREEN_WIDTH = 800;
@@ -23,6 +24,7 @@ public class Game extends StateBasedGame {
         super(title);
         this.addState(new MainMenu(MENU));
         this.addState(new Play(PLAY));
+        this.addState(new Lobby(LOBBY));
     }
 
     @Override
