@@ -54,6 +54,7 @@ public class GameServer implements Runnable{
     int connectedPlayers;
     int totalPlayers;
     DatagramSocket serverSocket = null;
+    int winnerId = -1;
 
     // Initial X and Y positions of Cars
     ArrayList<Point> initialPositions = new ArrayList<Point>();
@@ -277,7 +278,28 @@ public class GameServer implements Runnable{
                         broadcastMessage(GAME_ONGOING, message);
                     }
 
+                    // Check if there's already a winner
+                    int playerCount = 0;
+                    Player alivePlayer;
+                    for(Player player : this.players){
+                        if(player.isAlive()) {
+                            playerCount++;
+                            alivePlayer = player;
+                        }
+                        if(playerCount > 2) break;
+                    }
+
+                    // One player left
+                    if(playerCount == 1) {
+                        serverState = GAME_ENDED;
+                        winnerId = alivePlayer.getId();
+                    }
+
                     break;
+
+                case GAME_ENDED:
+                    break;
+
             }
         }
     }
