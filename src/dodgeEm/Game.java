@@ -6,6 +6,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import java.awt.Font;
 import java.io.InputStream;
+import java.net.SocketException;
 
 public class Game extends StateBasedGame {
 
@@ -19,7 +20,7 @@ public class Game extends StateBasedGame {
     public static final float CENTER_X = 400;
     public static final float CENTER_Y = 300;
 
-    public Game(String title){
+    public Game(String title) throws SocketException, SlickException {
         super(title);
         this.addState(new MainMenu(MENU));
         this.addState(new Play(PLAY));
@@ -39,6 +40,8 @@ public class Game extends StateBasedGame {
             app.start();
 
         }catch (SlickException e){
+            e.printStackTrace();
+        } catch (SocketException e) {
             e.printStackTrace();
         }
     }

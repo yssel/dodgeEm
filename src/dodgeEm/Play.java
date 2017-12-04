@@ -1,11 +1,17 @@
 package dodgeEm;
 
+import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.state.*;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +41,7 @@ public class Play extends BasicGameState implements GameConfig {
     private int cursorY = 0;
 
     /** BUMPER CARS **/
-    private Car car = null;
+    private ConcurrentHashMap<Integer,Car> cars;
     private Car myCar = null;
 
     /** COLLECTIONS OF GAME OBJECTS **/
@@ -48,8 +54,14 @@ public class Play extends BasicGameState implements GameConfig {
     private TrueTypeFont chatFont;
     protected static ConcurrentLinkedDeque<Message> chatMessages;
 
+    /** UDP **/
+    private DatagramSocket socket= new DatagramSocket();
+    private String serverdata;
+    private boolean connected=false;
+    private boolean started=false;
 
-    public Play(int state) {
+    public Play(int state) throws SocketException {
+        socket.setSoTimeout(100);
     }
 
     @Override
@@ -66,8 +78,9 @@ public class Play extends BasicGameState implements GameConfig {
         powerUps = new ConcurrentHashMap<>();
 
         /** INITIALIZE OTHER BUMPER CARS **/
-        car = new Car("Yssel", 1, 0);
-        car.init(650, 500);
+        /*car = new Car("Yssel", 1, 0);
+        car.init(650, 500);*/
+        cars = new ConcurrentHashMap<>();
 
         /** INITIALIZE MY CAR **/
         myCar = new Car(MainMenu.name, MainMenu.carColor, 180);
@@ -94,6 +107,11 @@ public class Play extends BasicGameState implements GameConfig {
                     break;
             }
         }
+        for(int i=0; i<playerNum-1; i++){
+            cars.put(i, new Car("", 1, 0));
+            cars.get(i).init(650, 500);
+        }
+        System.out.println("CARS:"+cars);
 
         /** INITIALIZE CHAT CLIENT **/
         chatFont = Game.loadFont("res/zig.ttf", 20f);
@@ -103,54 +121,112 @@ public class Play extends BasicGameState implements GameConfig {
 
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
-        /** RENDERING OF MAP **/
-        map.draw(mapX, mapY);
+        if(connected && started){
+            /** RENDERING OF MAP **/
+            map.draw(mapX, mapY);
 
-        /** RENDERING OF POWER UPS **/
-        for(Integer i: powerUps.keySet()){
-            powerUps.get(i).render();
+            /** RENDERING OF POWER UPS **/
+            for(Integer i: powerUps.keySet()){
+                powerUps.get(i).render();
+            }
+            /**RENDERING OF BUMPER CARS */
+            if (serverdata.startsWith("PLAYER")){
+                String[] playersInfo = serverdata.split(":");
+                boolean encountered = false;
+                for (int i=0;i<playersInfo.length;i++){
+                    String[] playerInfo = playersInfo[i].split(" ");
+                    String pname =playerInfo[1];
+                    if(pname.equals(myCar.getName())){
+                        System.out.println("ENTERED HERE");
+                        myCar.renderFixed();
+                        /** CURRENT LOCATION OF MY CAR **/
+                        graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
+                        encountered=true;
+                    }else{
+                        System.out.println("RECEIVED: "+ playerInfo[i]);
+                        if(!encountered){
+                            cars.get(i).update( Float.parseFloat(playerInfo[2]),Float.parseFloat(playerInfo[3]),Float.parseFloat(playerInfo[4]), Float.parseFloat(playerInfo[5]),Float.parseFloat(playerInfo[6]),Float.parseFloat(playerInfo[7]),Float.parseFloat(playerInfo[8]),Float.parseFloat(playerInfo[9]), Float.parseFloat(playerInfo[10]), Float.parseFloat(playerInfo[11]), playerInfo[1], Integer.parseInt(playerInfo[12]));
+                            cars.get(i).render();
+                        } else{
+                            cars.get(i-1).update( Float.parseFloat(playerInfo[2]),Float.parseFloat(playerInfo[3]),Float.parseFloat(playerInfo[4]), Float.parseFloat(playerInfo[5]),Float.parseFloat(playerInfo[6]),Float.parseFloat(playerInfo[7]),Float.parseFloat(playerInfo[8]),Float.parseFloat(playerInfo[9]), Float.parseFloat(playerInfo[10]), Float.parseFloat(playerInfo[11]), playerInfo[1], Integer.parseInt(playerInfo[12]));
+                            cars.get(i-1).render();
+                        }
+
+                    }
+                }
+            }
+
+            /** RENDERING OF BOUNDS **/
+            for(String key : bounds.keySet()){
+                graphics.setColor(Color.green);
+                graphics.draw(bounds.get(key));
+            }
+
+            /** RENDERING CHAT **/
+            renderChat(gameContainer, graphics);
         }
-
-        /**RENDERING OF BUMPER CARS */
-        car.render();
-        myCar.renderFixed();
-
-        /** CURRENT LOCATION OF MY CAR **/
-        graphics.drawString("x: " + (myCar.posX) + " y: " + (myCar.posY), 100, 10);
-
-        /** RENDERING OF BOUNDS **/
-        for(String key : bounds.keySet()){
-            graphics.setColor(Color.green);
-            graphics.draw(bounds.get(key));
-        }
-
-        /** RENDERING CHAT **/
-        renderChat(gameContainer, graphics);
     }
 
     @Override
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int delta) throws SlickException {
-        this.cursorX = Mouse.getX();
-        this.cursorY = gameContainer.getHeight() - Mouse.getY();
+        byte[] buf = new byte[256];
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        try{
+            socket.receive(packet);
+        }catch(Exception ioe){}
+        serverdata=new String(buf);
+        serverdata=serverdata.trim();
 
-        arenaRelativeToMap();
+        if (!connected && serverdata.startsWith("CONNECTED")) {
+            connected = true;
+            System.out.println("Connected.");
+        }else if (!connected){
+            System.out.println("Connecting..");
+            send("CONNECT "+myCar.getName());
+        }
+        if(serverdata.startsWith("START")){
+            started=true;
+        }
+        if(connected && started){
+            this.cursorX = Mouse.getX();
+            this.cursorY = gameContainer.getHeight() - Mouse.getY();
 
-        /** PLAY USING ARROW (DEBUGGING) **/
-        playArrow(gameContainer);
+            arenaRelativeToMap();
 
-        /** PLAY USING MOUSE **/
-        playCursor(delta);
+            /** PLAY USING ARROW (DEBUGGING) **/
+            playArrow(gameContainer);
 
-        /** TOGGLE CHAT BOX **/
-        toggleChatListener(gameContainer.getInput());
+            /** PLAY USING MOUSE **/
+           // playCursor(delta);
 
-        for(Integer i: powerUps.keySet()){
-            if(myCar.bounds.intersects(powerUps.get(i).bounds)){
-                myCar.usePowerUp(powerUps.get(i));
-                powerUps.remove(i);
+            /** TOGGLE CHAT BOX **/
+            toggleChatListener(gameContainer.getInput());
+
+            for(Integer i: powerUps.keySet()){
+                if(myCar.bounds.intersects(powerUps.get(i).bounds)){
+                    myCar.usePowerUp(powerUps.get(i));
+                    powerUps.remove(i);
+                }
             }
+
+            send("PLAYER "+myCar.getDetails());
         }
     }
+
+    /**
+     * Helper method for sending data to server
+     */
+    public void send(String msg){
+        try{
+            System.out.println("TOSEND: "+ msg);
+            byte[] buf = msg.getBytes();
+            InetAddress address= InetAddress.getByName(HOST);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, PORT);
+            socket.send(packet);
+        }catch(Exception e){}
+
+    }
+
 
     public void trackCursor(float targetX, float targetY){
         float opposite = targetY - Game.CENTER_Y;
@@ -167,17 +243,29 @@ public class Play extends BasicGameState implements GameConfig {
         if(this.cursorY < Game.CENTER_Y){
             myCar.posY -= (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
-            if(bounds.get("TOP").intersects(myCar.bounds) || car.collidedWith(myCar)){
+            if(bounds.get("TOP").intersects(myCar.bounds)){
                 myCar.posY += 100;
                 mapY = -(myCar.posY - Play.OFFSET_Y);
+            }
+            for(int i=0; i<playerNum-1;i++){
+                if(cars.get(i).collidedWith(myCar)){
+                    myCar.posY += 100;
+                    mapY = -(myCar.posY - Play.OFFSET_Y);
+                }
             }
         }
         if(this.cursorY > Game.CENTER_Y){
             myCar.posY += (delta * 0.1f * myCar.speed);
             mapY = -(myCar.posY - Play.OFFSET_Y);
-            if(bounds.get("BOTTOM").intersects(myCar.bounds) || car.collidedWith(myCar)){
+            if(bounds.get("BOTTOM").intersects(myCar.bounds)){
                 myCar.posY -= 100;
                 mapY = -(myCar.posY - Play.OFFSET_Y);
+            }
+            for(int i=0; i<playerNum-1;i++){
+                if(cars.get(i).collidedWith(myCar)){
+                    myCar.posY -= 100;
+                    mapY = -(myCar.posY - Play.OFFSET_Y);
+                }
             }
         }
 
@@ -185,17 +273,29 @@ public class Play extends BasicGameState implements GameConfig {
         if(this.cursorX < Game.CENTER_X){
             myCar.posX -= (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
-            if(bounds.get("LEFT").intersects(myCar.bounds) || car.collidedWith(myCar)){
+            if(bounds.get("LEFT").intersects(myCar.bounds)){
                 myCar.posX += 100;
                 mapX = -(myCar.posX - Play.OFFSET_X);
+            }
+            for(int i=0; i<playerNum-1;i++){
+                if(cars.get(i).collidedWith(myCar)){
+                    myCar.posX += 100;
+                    mapX = -(myCar.posX - Play.OFFSET_X);
+                }
             }
         }
         if(this.cursorX > Game.CENTER_X){
             myCar.posX += (delta * 0.1f * myCar.speed);
             mapX = -(myCar.posX - Play.OFFSET_X);
-            if(bounds.get("RIGHT").intersects(myCar.bounds) || car.collidedWith(myCar)){
+            if(bounds.get("RIGHT").intersects(myCar.bounds)){
                 myCar.posX -= 100;
                 mapX = -(myCar.posX - Play.OFFSET_X);
+            }
+            for(int i=0; i<playerNum-1;i++){
+                if(cars.get(i).collidedWith(myCar)){
+                    myCar.posX -= 100;
+                    mapX = -(myCar.posX - Play.OFFSET_X);
+                }
             }
         }
     }
