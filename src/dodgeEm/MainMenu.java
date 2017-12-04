@@ -33,6 +33,8 @@ public class MainMenu extends BasicGameState {
     private TextField nameField;
     private TrueTypeFont nameFieldFont;
 
+    private ConfigDialog configDialog;
+
     public MainMenu(int state){ }
 
     @Override
@@ -60,6 +62,10 @@ public class MainMenu extends BasicGameState {
         nameField = initNameField(gameContainer, nameFieldFont);
 
 
+        configDialog = new ConfigDialog(gameContainer);
+        nameField.setFocus(true);
+
+
 
     }
 
@@ -84,7 +90,6 @@ public class MainMenu extends BasicGameState {
 
         /** DISPLAY NAME TEXT FIELD **/
         nameField.render(gameContainer, graphics);
-        nameField.setFocus(true);
         nameField.setLocation(Math.round(Game.CENTER_X - (this.nameFieldFont.getWidth(this.nameField.getText())/2)),
                 Math.round(Game.CENTER_Y + 112));
 
@@ -92,6 +97,8 @@ public class MainMenu extends BasicGameState {
         startBtn.drawCentered(Game.CENTER_X, Game.CENTER_Y + 215);
         settingsBtn.drawCentered(50, Game.SCREEN_HEIGHT-50);
         helpBtn.drawCentered(50, Game.SCREEN_HEIGHT-130);
+
+        configDialog.render(gameContainer, graphics);
     }
 
     @Override
@@ -167,12 +174,23 @@ public class MainMenu extends BasicGameState {
         if(this.xPos > 50 - roundBtnWidth && this.xPos < 50 + roundBtnWidth &&
                 this.yPos > Game.SCREEN_HEIGHT - 50 - roundBtnHeight && this.yPos < Game.SCREEN_HEIGHT - 50 + roundBtnHeight){
             settingsBtn = this.buttons.getSubImage(settingsBtn.getWidth(), this.startBtn.getHeight(), 66, 71); //set texture to hover
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                nameField.setFocus(false);
+                configDialog.show();
+            }
         }
 
         /* HELP BUTTON */
-        if(this.xPos > 50 - roundBtnWidth && this.xPos < 50 + roundBtnWidth &&
+        if(this.xPos > 5 - roundBtnWidth && this.xPos < 50 + roundBtnWidth &&
                 this.yPos > Game.SCREEN_HEIGHT - 130 - roundBtnHeight && this.yPos < Game.SCREEN_HEIGHT - 130 + roundBtnHeight){
             helpBtn = this.buttons.getSubImage(this.settingsBtn.getWidth()*3, this.startBtn.getHeight(), 66, 71); //set texture to hover
+        }
+        if(this.xPos > 593 && this.xPos < 644 &&
+                this.yPos > 188 && this.yPos < 241 && configDialog.isVisible){
+            settingsBtn = this.buttons.getSubImage(settingsBtn.getWidth(), this.startBtn.getHeight(), 66, 71); //set texture to hover
+            if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                configDialog.hide();
+            }
         }
     }
 
