@@ -109,4 +109,8 @@ public class Player {
         // Format: id-carAngle-posX-posY-hP
         return Integer.toString(this.id) + "-" + this.angle  + "-" + this.posX  + "-" + this.posY  + "-" + this.hp;
     }
+
+    public boolean isAlive(){
+        return if(this.playerAlive == 1) true : false;
+    }
 }
