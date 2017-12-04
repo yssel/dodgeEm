@@ -244,7 +244,7 @@ public class Car {
             this.hp -= car.damage; //Collision damage when the opponent attacks from side and tail
 
             /** HEAD TO HEAD COLLISION DAMAGE **/
-            if(this.getHead().intersects(car.getHead())){
+            if(this.getHead().intersects(car.getHead()) && car.hp > 0){
                 car.hp -= this.damage;
             }
             return true;

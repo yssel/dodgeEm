@@ -64,7 +64,7 @@ public class Play extends BasicGameState implements GameConfig {
 
 
     public Play(int state) throws SocketException {
-        socket.setSoTimeout(100);
+        socket.setSoTimeout(10);
     }
 
     @Override
@@ -167,6 +167,9 @@ public class Play extends BasicGameState implements GameConfig {
 
             /** RENDERING CHAT **/
             renderChat(gameContainer, graphics);
+
+
+            graphics.drawString("carX: " + myCar.posX + "carY: " + myCar.posY, 200, 40);
         }
     }
 
