@@ -21,6 +21,9 @@ public class Game extends StateBasedGame {
     public static final float CENTER_Y = 300;
     public static Font globalFont;
 
+    public static String HOST = GameConfig.HOST;
+    public static int PORT = GameConfig.PORT;
+
     public Game(String title) throws SocketException, SlickException {
         super(title);
         this.addState(new MainMenu(MENU));

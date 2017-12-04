@@ -226,8 +226,8 @@ public class Play extends BasicGameState implements GameConfig {
         try{
             System.out.println("TOSEND: "+ msg);
             byte[] buf = msg.getBytes();
-            InetAddress address= InetAddress.getByName(HOST);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, PORT);
+            InetAddress address= InetAddress.getByName(Game.HOST);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Game.PORT);
             socket.send(packet);
         }catch(Exception e){}
 

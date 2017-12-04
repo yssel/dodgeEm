@@ -13,7 +13,7 @@ public class ChatClient implements GameConfig, Runnable {
 
   public void startChatSession(String playerName){
     try {
-      clientSocket = new Socket(HOST, PORT);
+      clientSocket = new Socket(Game.HOST, Game.PORT);
       os = new PrintStream(clientSocket.getOutputStream());
       is = new DataInputStream(clientSocket.getInputStream());
       sendName(playerName); //send name to server

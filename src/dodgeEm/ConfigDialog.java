@@ -44,16 +44,16 @@ public class ConfigDialog {
 
     public void hide(){
         this.isVisible = false;
-//        GameConfig.HOST = hostField.getText();
-//        GameConfig.PORT = Integer.parseInt(portField.getText());
+        Game.HOST = hostField.getText();
+        Game.PORT = Integer.parseInt(portField.getText());
     }
 
     private void initHostTextField(GameContainer gameContainer){
         this.hostField = new TextField(gameContainer, Game.deriveFont(35f),
                 Math.round(Game.CENTER_X)-88, Math.round(Game.CENTER_Y)-50,
                 Game.deriveFont(35f).getWidth("192.168.255.255"), 38);
-        this.hostField.setText(GameConfig.HOST);
-        this.hostField.setCursorPos(GameConfig.HOST.length());
+        this.hostField.setText(Game.HOST);
+        this.hostField.setCursorPos(Game.HOST.length());
         this.hostField.setBackgroundColor(Color.transparent);
         this.hostField.setTextColor(Color.white);
         this.hostField.setBorderColor(Color.transparent);
@@ -64,8 +64,8 @@ public class ConfigDialog {
                 Math.round(Game.CENTER_X) - 88, Math.round(Game.CENTER_Y) + 15,
                 Game.deriveFont(35f).getWidth("192.168.255.255"), 38);
 
-        this.portField.setText(Integer.toString(GameConfig.PORT));
-        this.portField.setCursorPos(Integer.toString(GameConfig.PORT).length());
+        this.portField.setText(Integer.toString(Game.PORT));
+        this.portField.setCursorPos(Integer.toString(Game.PORT).length());
         this.portField.setBackgroundColor(Color.transparent);
         this.portField.setTextColor(Color.white);
         this.portField.setBorderColor(Color.transparent);
