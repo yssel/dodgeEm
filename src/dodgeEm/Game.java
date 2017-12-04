@@ -19,17 +19,19 @@ public class Game extends StateBasedGame {
     public static final int SCREEN_HEIGHT = 600;
     public static final float CENTER_X = 400;
     public static final float CENTER_Y = 300;
+    public static Font globalFont;
 
     public Game(String title) throws SocketException, SlickException {
         super(title);
         this.addState(new MainMenu(MENU));
         this.addState(new Play(PLAY));
+        this.loadFont("res/Octarine-Bold.otf");
     }
 
     @Override
     public void initStatesList(GameContainer gameContainer) throws SlickException {
-        this.getState(MENU).init(gameContainer, this);
-        this.enterState(MENU);
+//        this.getState(MENU).init(gameContainer, this);
+//        this.enterState(MENU);
     }
 
     public static void main(String[] args){
@@ -55,5 +57,18 @@ public class Game extends StateBasedGame {
 
         } catch (Exception e) {}
         return null;
+    }
+
+    public static TrueTypeFont deriveFont(float size){
+        return new TrueTypeFont(Game.globalFont.deriveFont(size), true);
+    }
+
+    public void loadFont(String res){
+        try {
+            InputStream inputStream	= ResourceLoader.getResourceAsStream(res);
+            Game.globalFont = java.awt.Font.createFont(Font.TRUETYPE_FONT, inputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
