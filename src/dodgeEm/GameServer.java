@@ -10,12 +10,12 @@ import java.util.Random;
 
 public class GameServer implements Runnable{
     // SERVER States
-    public final int INITIALIZING_SERVER = 0;
-    public final int WAITING_FOR_PLAYERS = 1;
-    public final int CONNECTED_PLAYER = 2;
-    public final int GAME_START = 3;
-    public final int GAME_ONGOING = 4;
-    public final int GAME_ENDED = 5;
+    public static final int INITIALIZING_SERVER = 0;
+    public static final int WAITING_FOR_PLAYERS = 1;
+    public static final int CONNECTED_PLAYER = 2;
+    public static final int GAME_START = 3;
+    public static final int GAME_ONGOING = 4;
+    public static final int GAME_ENDED = 5;
 
     /**
      SERVER SEND DATA FORMAT:
@@ -28,10 +28,10 @@ public class GameServer implements Runnable{
      **/
 
     // CLIENT States
-    public final int CONNECTING_PLAYER = 0;
-    public final int WAITING_FOR_START = 1;
-    public final int PLAYING_GAME = 2;
-    public final int PLAYER_DIED = 3;
+    public static final int CONNECTING_PLAYER = 0;
+    public static final int WAITING_FOR_START = 1;
+    public static final int PLAYING_GAME = 2;
+    public static final int PLAYER_DIED = 3;
 
     /**
      CLIENT SEND DATA FORMAT:
@@ -70,6 +70,7 @@ public class GameServer implements Runnable{
 
         // INITIALIZE SERVER
         this.serverState = INITIALIZING_SERVER;
+        System.out.println("Server state: " + serverState);
 
         // Establish connection
         try{
@@ -82,6 +83,7 @@ public class GameServer implements Runnable{
 
         // WAIT FOR PLAYERS TO COMPLETE
         this.serverState = WAITING_FOR_PLAYERS;
+        System.out.println("Server state: " + serverState);
         this.connectedPlayers = 0;
 
         // Start main game thread
@@ -124,11 +126,11 @@ public class GameServer implements Runnable{
     public void broadcastMessage(int state, String message){
         for(Player player : players){
             // Format: "state,message"
-            message = state + "," + message;
+            message = Integer.toString(state) + "," + message;
 
             // send message to each player
-            DatagramPacket packet;
             byte buf[] = message.getBytes();
+            DatagramPacket packet;
             packet = new DatagramPacket(buf, buf.length, player.getAddress(),player.getPort());
             try{
                 this.serverSocket.send(packet);
@@ -165,9 +167,13 @@ public class GameServer implements Runnable{
                     playerData = playerData.trim();
 
                     tokens = playerData.split(",");
-                    playerState = Integer.parseInt(tokens[0]);
+                    if(tokens[0].length() > 0){
+                        playerState = Integer.parseInt(tokens[0]);
+                    }else{
+                        playerState = -1;
+                    }
 
-                    if(playerState == CONNECTING_PLAYER){
+                    if(playerState == CONNECTING_PLAYER && tokens.length > 1){
                         // Tokenize
                         // Fomat: name-carColor
                         tokens2 = tokens[1].split("-");
@@ -186,22 +192,24 @@ public class GameServer implements Runnable{
                         Player player = new Player(this.connectedPlayers, packet.getPort(), packet.getAddress(), carName, carColor, carAngle, initialX, initialY);
                         players.add(player);
 
-                        // Inform players a new player has connected
-                        // Format: 2,carName-carColor
-                        String message = carName + "-" + carColor;
-                        broadcastMessage(CONNECTED_PLAYER, message);
-
                         // Update playerCount
                         connectedPlayers++;
                         if(connectedPlayers == totalPlayers) {
                             serverState = GAME_START;
                         }
+
+                        // Inform players a new player has connected
+                        // Format: 2,connectedPlayers-totalPlayers
+                        String message = Integer.toString(connectedPlayers) + "-" + Integer.toString(totalPlayers);
+
+                        broadcastMessage(CONNECTED_PLAYER, message);
                     }
 
                     break;
 
                 case GAME_START:
                     // All players are now registered
+                    System.out.println("Server state: " + serverState);
 
                     // Broadcast player database to all
                     // Format: 4,id-carName-carColor-initialX-initialY/
@@ -234,9 +242,13 @@ public class GameServer implements Runnable{
                     playerData = playerData.trim();
 
                     tokens = playerData.split(",");
-                    playerState = Integer.parseInt(tokens[0]);
+                    if(tokens[0].length() > 0){
+                        playerState = Integer.parseInt(tokens[0]);
+                    }else{
+                        playerState = -1;
+                    }
 
-                    if(playerState == PLAYING_GAME){
+                    if(playerState == PLAYING_GAME && tokens.length > 1){
                         // Tokenize
                         // Format: PlayerID-posX-posY-angle-bumped-bumpType-opponentId
                         tokens2 = tokens[1].split("-");
@@ -280,7 +292,7 @@ public class GameServer implements Runnable{
 
                     // Check if there's already a winner
                     int playerCount = 0;
-                    Player alivePlayer;
+                    Player alivePlayer = null;
                     for(Player player : this.players){
                         if(player.isAlive()) {
                             playerCount++;

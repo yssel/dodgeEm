@@ -24,7 +24,7 @@ public class Player {
     private float maxSpeed;
 
     // Power Up
-    protected PowerUp item = null;
+    //protected PowerUp item = null;
 
     public Player(int id, int port, InetAddress address, String name, int carColor, float carAngle, int initialX, int initialY){
         /** CLIENT **/
