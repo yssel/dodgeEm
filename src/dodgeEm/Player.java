@@ -24,7 +24,7 @@ public class Player {
     private float maxSpeed;
 
     // Power Up
-    protected PowerUp item = null;
+    //protected PowerUp item = null;
 
     public Player(int id, int port, InetAddress address, String name, int carColor, float carAngle, int initialX, int initialY){
         /** CLIENT **/
@@ -111,6 +111,6 @@ public class Player {
     }
 
     public boolean isAlive(){
-        return if(this.playerAlive == 1) true : false;
+        return this.playerAlive == 1;
     }
 }
