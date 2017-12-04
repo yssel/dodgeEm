@@ -24,7 +24,7 @@ public class Game extends StateBasedGame {
     public static String HOST = GameConfig.HOST;
     public static int PORT = GameConfig.PORT;
 
-    public Game(String title) throws SocketException, SlickException {
+    public Game(String title) throws SocketException, SlickException, Exception {
         super(title);
         this.addState(new MainMenu(MENU));
         this.addState(new Play(PLAY));
@@ -47,6 +47,9 @@ public class Game extends StateBasedGame {
         }catch (SlickException e){
             e.printStackTrace();
         } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }

@@ -61,10 +61,11 @@ public class Play extends BasicGameState implements GameConfig {
     private String serverdata;
     private boolean connected=false;
     private boolean started=false;
+    private ScoreBoard scoreBoard;
 
-
-    public Play(int state) throws SocketException {
+    public Play(int state) throws SocketException, Exception {
         socket.setSoTimeout(10);
+
     }
 
     @Override
@@ -120,7 +121,15 @@ public class Play extends BasicGameState implements GameConfig {
         chatFont = Game.loadFont("res/zig.ttf", 20f);
         chatBox = initChatBox(gameContainer, chatFont);
         chatMessages = new ConcurrentLinkedDeque<>();
-   }
+        try {
+            scoreBoard = new ScoreBoard();
+//            scoreBoard.writeScorers();
+            scoreBoard.readScorersArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
@@ -171,6 +180,9 @@ public class Play extends BasicGameState implements GameConfig {
 
 //            graphics.drawString("carX: " + myCar.posX + "carY: " + myCar.posY, 200, 40);
         }
+
+        /** RENDERING OF SCORE BOARD **/
+        scoreBoard.render();
     }
 
     @Override
@@ -216,6 +228,7 @@ public class Play extends BasicGameState implements GameConfig {
             }
 
             send("PLAYER "+myCar.getDetails());
+            scoreBoard.listen(gameContainer.getInput());
         }
     }
 
@@ -230,7 +243,6 @@ public class Play extends BasicGameState implements GameConfig {
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Game.PORT);
             socket.send(packet);
         }catch(Exception e){}
-
     }
 
 
